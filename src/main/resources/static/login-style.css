@@ -1,0 +1,21 @@
+body{
+    background-color: darkslateblue;
+}
+
+form{
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+input{
+    width: 25%;
+    height: 40px;
+}
+
+p{
+    margin-top: 15%;
+    margin-left: 47%;
+    font-size: xx-large;
+    color:aliceblue
+}

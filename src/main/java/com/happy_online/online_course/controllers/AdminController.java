@@ -34,6 +34,12 @@ public class AdminController {
         return ResponseEntity.ok(userInfoResponses);
     }
 
+    @PutMapping("/user/reject-by-id/{id}")
+    public ResponseEntity<?> rejectById(@PathVariable Long id) {
+        userService.removeByIdNotActivate(id);
+        return ResponseEntity.ok(new MessageResponse("successfully rejected"));
+    }
+
     @PutMapping("/user/active-by-id/{id}")
     public ResponseEntity<?> activeUserById(@PathVariable Long id) {
         userService.activeById(id);

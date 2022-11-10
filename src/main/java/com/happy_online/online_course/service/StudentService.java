@@ -8,4 +8,7 @@ import com.happy_online.online_course.service.base.BaseService;
 
 public interface StudentService extends BaseService<Student, Long> {
     void saveStudentWithUser(SignupRequest signupRequest, User user);
+
+
+    void deleteByUsername(String username);
 }

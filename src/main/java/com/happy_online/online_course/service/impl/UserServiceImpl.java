@@ -1,7 +1,5 @@
 package com.happy_online.online_course.service.impl;
 
-import com.happy_online.online_course.exception.NotFoundException;
-import com.happy_online.online_course.models.ERole;
 import com.happy_online.online_course.models.Role;
 import com.happy_online.online_course.models.User;
 import com.happy_online.online_course.payload.request.UserSearchRequest;
@@ -9,6 +7,8 @@ import com.happy_online.online_course.payload.request.UserUpdateRequest;
 import com.happy_online.online_course.payload.response.UserInfoResponse;
 import com.happy_online.online_course.repository.RoleRepository;
 import com.happy_online.online_course.repository.UserRepository;
+import com.happy_online.online_course.service.StudentService;
+import com.happy_online.online_course.service.TeacherService;
 import com.happy_online.online_course.service.UserService;
 import com.happy_online.online_course.service.base.impl.BaseServiceImpl;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -17,26 +17,29 @@ import org.springframework.stereotype.Service;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class UserServiceImpl extends BaseServiceImpl<User, Long, UserRepository> implements UserService {
-    public UserServiceImpl(UserRepository repository, RoleRepository roleRepository) {
+    public UserServiceImpl(UserRepository repository, RoleRepository roleRepository, StudentService studentService, TeacherService teacherService) {
         super(repository);
         this.roleRepository = roleRepository;
+        this.studentService = studentService;
+        this.teacherService = teacherService;
     }
 
     final RoleRepository roleRepository;
+    final StudentService studentService;
+    final TeacherService teacherService;
 
     @Override
     public List<UserInfoResponse> notEnabledUsers(Boolean bool) {
         List<User> users = repository.findByEnabled(bool);
         List<UserInfoResponse> userInfoResponses = new ArrayList<>();
         users.forEach(user -> userInfoResponses.add(mapUserToUserInfoResponse(user)));
-        if (users.isEmpty()) {
-            // TODO: 11/3/2022 change exception
-            throw new NotFoundException("there is no result for your request");
-        }
         return userInfoResponses;
     }
 
@@ -75,8 +78,22 @@ public class UserServiceImpl extends BaseServiceImpl<User, Long, UserRepository>
     public void removeByIdNotActivate(Long id) {
         User user = findById(id);
         if (!user.getEnabled()) {
-            repository.delete(user);
+            Set<Role> roleSet = user.getRoles();
+            List<Role> roleList = new ArrayList<>(roleSet);
+            Role role = roleList.get(0);
+            switch (role.getName()) {
+                case ROLE_STUDENT: {
+                    studentService.deleteByUsername(user.getUsername());
+                    break;
+                }
+                case ROLE_TEACHER: {
+                    teacherService.deleteByUsername(user.getUsername());
+                    break;
+                }
+            }
+
         } else {
+            // TODO: 11/10/2022 change exception
             throw new BadCredentialsException("user id is wrong");
         }
     }
@@ -87,7 +104,7 @@ public class UserServiceImpl extends BaseServiceImpl<User, Long, UserRepository>
         if (user.getEnabled()) {
 
         } else {
-    if(updateRequest.getRoles().contains("nujl"));
+            if (updateRequest.getRoles().contains("nujl")) ;
         }
         return null;
     }

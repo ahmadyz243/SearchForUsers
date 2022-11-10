@@ -16,7 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Student extends BaseDomain<Long> {
-    @OneToOne()
+    @OneToOne(cascade = CascadeType.REMOVE)
     private User user;
     @JsonIgnore
     @ManyToMany(mappedBy = "studentList")

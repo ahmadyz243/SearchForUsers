@@ -1,21 +1,29 @@
 package com.happy_online.online_course.controllers;
 
-import com.happy_online.online_course.payload.response.MessageResponse;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseCookie;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 
 @Controller
 public class AdminCo {
-
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/admin-menu")
     public String admin() {
 
         return "views/admin-menu";
+    }
+
+    @PreAuthorize("hasRole('ROLE_TEACHER')")
+    @GetMapping("/master-menu")
+    public String master() {
+
+        return "views/master-menu";
+    }
+
+    @GetMapping("/signup")
+    public String signup() {
+
+        return "views/signup";
     }
 //    @PostMapping("/signout")
 //    public ResponseEntity<?> logoutUser() {

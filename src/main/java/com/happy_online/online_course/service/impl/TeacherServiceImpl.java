@@ -27,6 +27,11 @@ public class TeacherServiceImpl extends BaseServiceImpl<Teacher, Long, TeacherRe
         repository.save(teacher);
     }
 
+    @Override
+    public void deleteByUsername(String username) {
+        repository.deleteByUsername(username);
+    }
+
     public Teacher mapSignUpRequestToStudent(SignupRequest signupRequest) {
         Teacher teacher = new Teacher();
         BeanUtils.copyProperties(signupRequest, teacher);

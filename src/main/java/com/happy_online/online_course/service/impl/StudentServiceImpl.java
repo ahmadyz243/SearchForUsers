@@ -30,6 +30,12 @@ public class StudentServiceImpl extends BaseServiceImpl<Student, Long, StudentRe
         repository.save(student);
     }
 
+    @Override
+    @Transactional
+    public void deleteByUsername(String username) {
+        repository.deleteByUsername(username);
+    }
+
     public Student mapSignUpRequestToStudent(SignupRequest signupRequest) {
         Student student = new Student();
         BeanUtils.copyProperties(signupRequest, student);

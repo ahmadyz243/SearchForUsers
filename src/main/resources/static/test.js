@@ -26,7 +26,39 @@ $(document).ready(function () {
                     } else if (response[0] === "ROLE_TEACHER") {
                         window.location.href = "/master-menu";
                     }
-
+                },
+                error: function (erorMessage) {
+                    console.log(erorMessage);
+                }
+            })
+        })
+        //SIGNUP---------------------------------------------------------
+        $("#signup").click(function (event) {
+            event.preventDefault();
+            var name = $('input[name="name"]').val();
+            var lastname = $('input[name="lastname"]').val();
+            var username = $('input[name="username"]').val();
+            var nationalCode = $('input[name="nationalCode"]').val();
+            var password = $('input[name="password"]').val();
+            var role = $('input[name="role"]:checked').val();
+            var user = {
+                name: name,
+                lastname: lastname,
+                username: username,
+                nationalCode: nationalCode,
+                password: password,
+                role: [role]
+            }
+            console.log(user);
+            $.ajax({
+                url: "/api/auth/signup",
+                method: "POST",
+                contentType: "application/json",
+                dataType: "json",
+                data: JSON.stringify(user),
+                success: function (response) {
+                    window.location.href = "/login";
+                    alert("signed up successfully")
                 },
                 error: function (erorMessage) {
                     console.log(erorMessage);
@@ -61,7 +93,6 @@ $(document).ready(function () {
                             studentRequests.push(response[i])
                         }
                     }
-
                     for (let i = 0; i < masterRequests.length; i++) {
                         masterRequest = masterRequest +
                             "<div class=\"signupRequest\"> " +
@@ -94,13 +125,16 @@ $(document).ready(function () {
                         var userId = $(this).attr('value');
                         reject(userId);
                     });
+                    $('.acceptReq').click(function () {
+                        var userId = $(this).attr('value');
+                        accept(userId);
+                    });
                 },
                 error: function (erorMessage) {
                     console.log(erorMessage);
                 }
             })
         }
-
 
 
         function reject(id) {
@@ -117,6 +151,20 @@ $(document).ready(function () {
                 }
             })
         }
+    function accept(id) {
+        $.ajax({
+            url: "/api/admin/user/active-by-id/" + id,
+            method: "PUT",
+            contentType: "application/json",
+            dataType: "json",
+            success: function (response) {
+                viewSignUpRequest();
+                alert("user accepted successfully");
+            }, error: function (erorMessage) {
+                console.log(erorMessage);
+            }
+        })
+    }
 
         $("#acceptRequest").click(function () {
             /*

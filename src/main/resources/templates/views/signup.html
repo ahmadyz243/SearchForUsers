@@ -4,19 +4,22 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../../../../../../../Desktop/New%20folder/login-style.css">
+    <link rel="stylesheet" href="login-style.css">
+    <script src="jquery.min.js"></script>
     <title>Signup</title>
 </head>
 <body>
-    <p>Signup</p>
-    <form action="" method="post">
-        <input type="text" name="firstname" placeholder="firstname">
-        <input type="text" name="lastname" placeholder="lastname">
-        <input type="text" name="username" placeholder="username">
-        <input type="password" name="password" placeholder="password">
-        teacher<input type="radio" name="role" value="teacher">
-        student<input type="radio" name="role" value="student">
-        <input type="submit" value="login">
-    </form>
+<p>Signup</p>
+<form method="post">
+    <input id="name" type="text" name="name" placeholder="firstname">
+    <input id="lastname" type="text" name="lastname" placeholder="lastname">
+    <input id="username" type="text" name="username" placeholder="username">
+    <input id="nationalCode" type="number" name="nationalCode" placeholder="nationalCode">
+    <input id="password" type="password" name="password" placeholder="password">
+    teacher<input type="radio" name="role" value="ROLE_TEACHER">
+    student<input type="radio" name="role" value="ROLE_STUDENT">
+    <input id="signup" type="submit" value="login">
+</form>
+<script src="test.js"></script>
 </body>
 </html>

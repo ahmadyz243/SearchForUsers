@@ -6,6 +6,7 @@ import com.happy_online.online_course.models.Student;
 import com.happy_online.online_course.models.Teacher;
 import com.happy_online.online_course.payload.request.CreateCourseRequest;
 import com.happy_online.online_course.payload.response.CourseInfoResponse;
+import com.happy_online.online_course.payload.response.CourseInfoResponseTeacher;
 import com.happy_online.online_course.repository.CourseRepository;
 import com.happy_online.online_course.service.CourseService;
 import com.happy_online.online_course.service.StudentService;
@@ -15,6 +16,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,8 +34,11 @@ public class CourseServiceImpl extends BaseServiceImpl<Course, Long, CourseRepos
     final StudentService studentService;
 
     @Override
-    public Course saveCourse(CreateCourseRequest courseRequest) {
-        return repository.save(convertRequestToCourse(courseRequest));
+    @Transactional
+    public Course saveCourse(Teacher teacher, CreateCourseRequest courseRequest) {
+        Course course = convertRequestToCourse(courseRequest);
+        course.setTeacher(teacher);
+        return repository.save(course);
     }
 
     @Override
@@ -87,6 +92,28 @@ public class CourseServiceImpl extends BaseServiceImpl<Course, Long, CourseRepos
         List<CourseInfoResponse> courseInfoResponses = new ArrayList<>();
         courses.forEach(course -> courseInfoResponses.add(convertCourseToResponse(course)));
         return courseInfoResponses;
+    }
+
+    @Override
+    public List<Course> findByTeacher(Teacher teacher) {
+        return repository.findByTeacherOrderByIsActive(teacher);
+    }
+
+    @Override
+    public List<CourseInfoResponseTeacher> mapCourseToResponse(Teacher teacher) {
+        List<Course> course = repository.findByTeacherOrderByIsActive(teacher);
+        CourseInfoResponseTeacher courseInfoResponse = new CourseInfoResponseTeacher();
+        List<CourseInfoResponseTeacher> courseInfoResponses = new ArrayList<>();
+        course.forEach(current -> courseInfoResponses.add(mapCourseToResponseSolver(current)));
+        return courseInfoResponses;
+    }
+
+    private CourseInfoResponseTeacher mapCourseToResponseSolver(Course course) {
+        CourseInfoResponseTeacher courseInfoResponse = new CourseInfoResponseTeacher();
+        courseInfoResponse.setId(course.getId());
+        courseInfoResponse.setIsActive(course.getActive());
+        BeanUtils.copyProperties(course, courseInfoResponse);
+        return courseInfoResponse;
     }
 
     private CourseInfoResponse convertCourseToResponse(Course course) {

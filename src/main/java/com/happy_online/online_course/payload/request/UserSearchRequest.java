@@ -11,7 +11,6 @@ import java.util.Set;
 public class UserSearchRequest {
     private String name;
     private String lastname;
-    private String username;
     private String nationalCode;
     private Set<Role> roles;
 }

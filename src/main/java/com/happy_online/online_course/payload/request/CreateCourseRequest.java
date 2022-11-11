@@ -9,6 +9,7 @@ import java.sql.Date;
 @Setter
 @Getter
 public class CreateCourseRequest {
+    private Long masterId;
 
     private String description;
 

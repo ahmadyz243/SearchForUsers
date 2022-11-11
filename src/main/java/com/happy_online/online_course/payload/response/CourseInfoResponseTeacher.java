@@ -11,14 +11,13 @@ import java.util.List;
 
 @Getter
 @Setter
-public class CourseInfoResponse {
+public class CourseInfoResponseTeacher {
     private Long id;
     private Date endDate;
     private Date startDate;
     private String description;
     private String title;
     private List<Exam> examList;
-    private Teacher teacher;
     private List<Student> studentList;
     private Boolean isActive;
 }

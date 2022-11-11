@@ -151,129 +151,273 @@ $(document).ready(function () {
                 }
             })
         }
-    function accept(id) {
-        $.ajax({
-            url: "/api/admin/user/active-by-id/" + id,
-            method: "PUT",
-            contentType: "application/json",
-            dataType: "json",
-            success: function (response) {
-                viewSignUpRequest();
-                alert("user accepted successfully");
-            }, error: function (erorMessage) {
-                console.log(erorMessage);
-            }
-        })
-    }
 
-        $("#acceptRequest").click(function () {
-            /*
-            //url
-            var u = "";
-            var x;
-            $ajax({
-                url: u,
-                type: "GET",
-                beforeSend: function(){
-                    console.log("hiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii");
-                },
-                //-----------
-                success: function(response){
-                    x = response.items;
-                    console.log(response.items);
-                    alert("request accepted...");
+        function accept(id) {
+            $.ajax({
+                url: "/api/admin/user/active-by-id/" + id,
+                method: "PUT",
+                contentType: "application/json",
+                dataType: "json",
+                success: function (response) {
+                    viewSignUpRequest();
+                    alert("user accepted successfully");
+                }, error: function (erorMessage) {
+                    console.log(erorMessage);
                 }
             })
-            */
-        })
+        }
+
+        //Add new Course-------------------------------------
 
         $("#addNewCourse").click(function () {
+            getMasters();
+        })
 
-            $("article").html("\
-        <h2>Add a Course</h2>\
-        <form action=\"\" method=\"\">\
-            <input type=\"text\" name=\"title\" placeholder=\"title\">\
-            <span class=\"tip\">choose a master</span>\
-            <select name=\"master\">\
-                <option value=\"\">hasan</option>\
-                <option value=\"\">ali</option>\
-                <option value=\"\">abbas</option>\
-                <option value=\"\">zahra</option>\
-            </select>\
-            <input type=\"submit\" value=\"add\">\
-        </form>\
-        ");
-
-            /*
-            //url
-            var u = "";
-            var x;
-            $ajax({
-                url: u,
-                type: "GET",
-                beforeSend: function(){
-                    console.log("hiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii");
-                },
-                //-----------
-                success: function(response){
-                    x = response.items;
-                    console.log(response.items);
-                    alert("request accepted...");
+        function getMasters() {
+            //var masters = new Object();
+            $.ajax({
+                url: "api/admin/teacher/find-all-actives",
+                method: "GET",
+                contentType: "application/json",
+                dataType: "json",
+                success: function (response) {
+                    addCourse(response);
+                }, error: function (erorMessage) {
+                    console.log(erorMessage);
                 }
             })
-            */
-        })
+        }
+
+        function addCourse(masters) {
+            console.log(masters);
+            var mastersCode = "";
+            masters.forEach(master => {
+                mastersCode = mastersCode + ("<option value=\"" + master.id + "\">" + master.name + " " + master.lastname + "</option>")
+            });
+            $("article").html("\
+                <h2>Add a Course</h2>\
+                <form action=\"\" method=\"\">\
+                <input id=\"title\" type=\"text\" name=\"title\" placeholder=\"title\">\
+                <input id=\"description\" type=\"text\" name=\"description\" placeholder=\"description\">\
+                <span class=\"tip\">choose a master</span>\
+                <select id=\"master\" name=\"master\">" +
+                mastersCode +
+                "</select>\
+                <input id=\"startDate\" type=\"date\">\
+                <input id=\"endDate\" type=\"date\">\
+                <input id=\"addCourse\" type=\"submit\" value=\"add\">\
+                </form>\
+            ")
+            $("#addCourse").click(function (event) {
+                event.preventDefault();
+                var title = $("#title").val();
+                var description = $("#description").val();
+                var masterId = $("#master").val();
+                var startDate = $("#startDate").val();
+                var endDate = $("#endDate").val();
+                var course = {
+                    title: title,
+                    masterId: masterId,
+                    description: description,
+                    startDate: startDate,
+                    endDate: endDate
+                }
+                $.ajax({
+                    url: "api/admin/course/create",
+                    method: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify(course),
+                    success: function (response) {
+                        alert("course saved successfully");
+                    },
+                    error: function (erorMessage) {
+                        console.log(erorMessage);
+                    }
+                })
+            })
+        }
 
         $("#searchByFields").click(function () {
+
             $("article").html("\
-        <h2>search for users</h2>\
-        <form action=\"\" method=\"post\">\
-            <input type=\"text\" name=\"firstname\" placeholder=\"firstname\">\
-            <input type=\"text\" name=\"lastname\" placeholder=\"lastname\">\
-            <input class=\"radio\" type=\"radio\" name=\"userType\" value=\"student\"><span class=\"tip\">student</span>\
-            <input class=\"radio\" type=\"radio\" name=\"userType\" value=\"master\"><span class=\"tip\">master</span>\
-            <input type=\"submit\" value=\"search\">\
-        </form>\
-        ")
+                <h2>search for users</h2>\
+                <form action=\"\" method=\"post\">\
+                <input id=\"firstname\" type=\"text\" name=\"firstname\" placeholder=\"firstname\">\
+                <input id=\"lastname\" type=\"text\" name=\"lastname\" placeholder=\"lastname\">\
+                <input id=\"nationalCode\" type=\"number\" name=\"nationalCode\" placeholder=\"nationalCode\">\
+                <input class=\"radio\" type=\"radio\" name=\"role\" value=\"ROLE_STUDENT\"><span class=\"tip\">student</span>\
+                <input class=\"radio\" type=\"radio\" name=\"role\" value=\"ROLE_TEACHER\"><span class=\"tip\">master</span>\
+                <input id=\"search\" type=\"submit\" value=\"search\">\
+                </form>\
+            ")
+            var usersSearched = [];
+            $("#search").click(function (event) {
+                event.preventDefault();
+                var firstname = $("#firstname").val();
+                var lastname = $("#lastname").val();
+                var nationalCode = $("#nationalCode").val();
+                var role = $('input[name="role"]:checked').val();
+                var userSearch = {
+                    name: firstname,
+                    lastname: lastname,
+                    roles: [{name:role}],
+                    nationalCode: nationalCode
+                }
+                console.log(userSearch);
+                search(userSearch);
+
+            })
+
+            function search(userSearch) {
+
+                $.ajax({
+                    url: "/api/admin/search",
+                    method: "POST",
+                    contentType: "application/json",
+                    dataType: "json",
+                    data: JSON.stringify(userSearch),
+                    success: function (response) {
+                        showSearchResult(response);
+                    },
+                    error: function (erorMessage) {
+                        console.log(erorMessage);
+                    }
+                })
+            }
         })
 
+        function showSearchResult(usersSearched) {
+            var userSearchCode = "";
+            usersSearched.forEach(user => {
+                userSearchCode = userSearchCode.concat("<div class=\"user\">\
+                    <span>" + user.name + "</span>\
+                    <span>" + user.lastname + "</span>\
+                    <span>" + user.nationalCode + "</span>\
+                    <span>" + user.roles[0].name + "</span>\
+                    </div>");
+            });
+            $("article").html("\
+                    <div id=\"foundedUsers\">\
+                    <div class=\"user\">\
+                    <span><b>Fistname</b></span>\
+                    <span><b>Lastname</b></span>\
+                    <span><b>National Code</b></span>\
+                    <span><b>Position</b></span>\
+                    </div>" +
+                userSearchCode +
+                "</div>\
+            ")
+        }
 
         $("#viewCourses").click(function () {
-            $("article").html("\
-        <div class=\"coursesContainer\">\
-            <div class=\"courses\">\
-                <h3>Courses</h3>\
-                <div class=\"titles\">\
-                    <span>title</span><span>begin date</span><span>finish date</span>\
-                </div>\
-                <div class=\"course\">\
-                    <span>java</span><span>1/1/1</span><span>2/2/2</span>\
-                </div>\
-            </div>\
-            <div class=\"courseDetails courseSpec\">\
-                <h3>Master</h3>\
-                <div class=\"courseDetail\">\
-                    <div class=\"name\">firstname lastname</div>\
-                    <button id=\"removeMasterFromCourse\" value=\"\">change master</button>\
-                </div>\
-                <h3>Students</h3>\
-                <div class=\"courseDetail\">\
-                    <div class=\"name\">ahmad yazdi</div>\
-                    <button id=\"removeStudentFromCourse\" value=\"\">remove from course</button>\
-                </div>\
-            </div>\
-            <div class=\"courseDetails courseSpec\">\
-                <button id=\"addNewStudentToCourse\"><b>add another student</b></button>\
-                <div class=\"courseDetail\">\
-                    <div class=\"details\">ahmad yazdi</div>\
-                </div>\
-            </div>\
-        </div>\
-        ")
+            var courses = getCourses();
+            var coursesCode = "";
+            var masterCode = "";
+            var studentsCode = "";
+            var otherStudentsCode = "";
+            courses.forEach(course => {
+                coursesCode = coursesCode.concat("<button value=\"" + course.id + "\" class=\"course\">\
+                <span>" + course.title + "</span><span>" + course.beginDate + "</span><span>" + course.finishDate + "</span>\
+                </button>")
+            });
+            viewCourses(coursesCode, "", "", "");
             $(".courseSpec").hide();
             $(".course").click(function () {
+                var courseId = $(this).attr('value');
+                var course = getCourseById(courseId);
+                masterCode = "<div class=\"courseDetail\">\
+                <div class=\"name\">" + course.master.name + " " + course.master.lastname + "</div>\
+                <button id=\"removeMasterFromCourse\" value=\"" + course.id + "\">change master</button>\
+                </div>";
+                var students = course.students;
+                students.forEach(student => {
+                    studentsCode = studentsCode.concat("<div class=\"courseDetail\">\
+                    <div class=\"name\">" + student.name + " " + student.lastname + "</div>\
+                    <button id=\"removeStudentFromCourse\" value=\"" + student.id + "\">remove from course</button>\
+                    </div>")
+                });
+                var otherStudents = getStudentsNotInCourse(courseId);
+                otherStudents.forEach(s => {
+                    otherStudentsCode = otherStudentsCode.concat("<div class=\"courseDetail\">\
+                    <div class=\"details\">" + s.name + " " + s.lastname + "</div>\
+                    </div>")
+                });
+                viewCourses(coursesCode, masterCode, studentsCode, otherStudentsCode);
                 $(".courseSpec").show();
             })
+
+            function getCourses() {
+                var courses = [];
+                $.ajax({
+                    url: "",
+                    method: "GET",
+                    contentType: "application/json",
+                    dataType: "json",
+                    success: function (response) {
+                        courses = response;
+                        return courses;
+                    }, error: function (erorMessage) {
+                        console.log(erorMessage);
+                    }
+                })
+            }
+
+            function getCourseById(id) {
+                var course;
+                $.ajax({
+                    url: "",
+                    method: "GET",
+                    contentType: "application/json",
+                    dataType: "json",
+                    success: function (response) {
+                        course = response;
+                        return course;
+                    }, error: function (erorMessage) {
+                        console.log(erorMessage);
+                    }
+                })
+            }
+
+            function getStudentsNotInCourse(courseId) {
+                var students = [];
+                $.ajax({
+                    url: "",
+                    method: "GET",
+                    contentType: "application/json",
+                    dataType: "json",
+                    success: function (response) {
+                        students = response;
+                        return students;
+                    }, error: function (erorMessage) {
+                        console.log(erorMessage);
+                    }
+                })
+            }
+
+            function viewCourses(coursesCode, masterCode, studentsCode, otherStudentsCode) {
+                $("article").html("\
+                <div class=\"coursesContainer\">\
+                <div class=\"courses\">\
+                <h3>Courses</h3>\
+                <div class=\"titles\">\
+                <span>title</span><span>begin date</span><span>finish date</span>\
+                </div>" +
+                    coursesCode +
+                    "</div>\
+                    <div class=\"courseDetails courseSpec\">\
+                    <h3>Master</h3>" +
+                    masterCode +
+                    "<h3>Students</h3>" +
+                    studentsCode +
+                    "</div>\
+                    <div class=\"courseDetails courseSpec\">\
+                    <button id=\"addNewStudentToCourse\"><b>add another student</b></button>" +
+                    otherStudentsCode +
+                    "</div>\
+                    </div>\
+                ")
+            }
+
         })
         // LOGOUT----------------------------------------------------------------------------
         $("#logout").click(function () {

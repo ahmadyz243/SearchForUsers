@@ -13,10 +13,16 @@ import com.happy_online.online_course.service.UserService;
 import com.happy_online.online_course.service.base.impl.BaseServiceImpl;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
-import javax.persistence.Transient;
-import javax.persistence.criteria.*;
-import java.util.*;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class UserServiceImpl extends BaseServiceImpl<User, Long, UserRepository> implements UserService {
@@ -64,9 +70,8 @@ public class UserServiceImpl extends BaseServiceImpl<User, Long, UserRepository>
             List<Predicate> predicates = new ArrayList<>();
             setName(predicates, root, criteriaBuilder, userSearch.getName());
             setLastname(predicates, root, criteriaBuilder, userSearch.getLastname());
-//            setRole(predicates, root, criteriaBuilder, roles.get(0));
+            setRole(predicates, root, criteriaBuilder, roles.get(0));
             setNationalCode(predicates, root, criteriaBuilder, userSearch.getNationalCode());
-            query.where(criteriaBuilder.isMember(roles.get(0), root.get("roles")));
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         });
     }
@@ -79,14 +84,8 @@ public class UserServiceImpl extends BaseServiceImpl<User, Long, UserRepository>
             List<Role> roleList = new ArrayList<>(roleSet);
             Role role = roleList.get(0);
             switch (role.getName()) {
-                case ROLE_STUDENT: {
-                    studentService.deleteByUsername(user.getUsername());
-                    break;
-                }
-                case ROLE_TEACHER: {
-                    teacherService.deleteByUsername(user.getUsername());
-                    break;
-                }
+                case ROLE_STUDENT -> studentService.deleteByUsername(user.getUsername());
+                case ROLE_TEACHER -> teacherService.deleteByUsername(user.getUsername());
             }
 
         } else {
@@ -106,16 +105,15 @@ public class UserServiceImpl extends BaseServiceImpl<User, Long, UserRepository>
         return null;
     }
 
-//    private void setRole(List<Predicate> predicates, Root<User> root, CriteriaBuilder criteriaBuilder, Role role) {
-//
-//        if (role != null) {
-//
-//            Fetch<User, Role> fetchRoles = root.fetch("roles", JoinType.LEFT);
-//            predicates.add(
-//                    criteriaBuilder.equal()
-//            );
-//        }
-//    }
+    private void setRole(List<Predicate> predicates, Root<User> root, CriteriaBuilder criteriaBuilder, Role role) {
+
+        if (role != null && !ObjectUtils.isEmpty(role.getName())) {
+            Join<Role, User> userRole = root.join("roles");
+            predicates.add(
+                    criteriaBuilder.equal(userRole.get("name"), role.getName())
+            );
+        }
+    }
 
     private void setLastname(List<Predicate> predicates, Root<User> root, CriteriaBuilder criteriaBuilder, String lastname) {
         if (lastname != null && !lastname.isBlank()) {

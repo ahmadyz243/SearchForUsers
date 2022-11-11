@@ -250,7 +250,6 @@ $(document).ready(function () {
                 <input id=\"search\" type=\"submit\" value=\"search\">\
                 </form>\
             ")
-            var usersSearched = [];
             $("#search").click(function (event) {
                 event.preventDefault();
                 var firstname = $("#firstname").val();

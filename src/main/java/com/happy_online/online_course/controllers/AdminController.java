@@ -1,19 +1,25 @@
 package com.happy_online.online_course.controllers;
 
+import com.happy_online.online_course.models.Teacher;
 import com.happy_online.online_course.models.User;
 import com.happy_online.online_course.payload.request.CreateCourseRequest;
 import com.happy_online.online_course.payload.request.UserSearchRequest;
 import com.happy_online.online_course.payload.request.UserUpdateRequest;
 import com.happy_online.online_course.payload.response.CourseInfoResponse;
 import com.happy_online.online_course.payload.response.MessageResponse;
+import com.happy_online.online_course.payload.response.TeacherResponseAddCourse;
 import com.happy_online.online_course.payload.response.UserInfoResponse;
 import com.happy_online.online_course.service.CourseService;
+import com.happy_online.online_course.service.TeacherService;
 import com.happy_online.online_course.service.UserService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -23,9 +29,12 @@ public class AdminController {
     final UserService userService;
     final CourseService courseService;
 
-    public AdminController(UserService userService, CourseService courseService) {
+    final TeacherService teacherService;
+
+    public AdminController(UserService userService, CourseService courseService, TeacherService teacherService) {
         this.userService = userService;
         this.courseService = courseService;
+        this.teacherService = teacherService;
     }
 
     @GetMapping("/user/not-actives")
@@ -46,10 +55,12 @@ public class AdminController {
         return ResponseEntity.ok(new MessageResponse("successfully activated"));
     }
 
-    @PostMapping("/course/create")
+    @PostMapping(value = "/course/create",consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> createCourse(@RequestBody CreateCourseRequest courseRequest) {
-        courseService.saveCourse(courseRequest);
-        return new ResponseEntity<>("course created ", HttpStatus.CREATED);
+        Teacher teacher = teacherService.findById(courseRequest.getMasterId());
+        courseService.saveCourse(teacher, courseRequest);
+
+        return new ResponseEntity<>("course created", HttpStatus.CREATED);
     }
 
     @PutMapping("/course/add-teacher/{course_id}/{teacher_id}")
@@ -62,6 +73,21 @@ public class AdminController {
     public ResponseEntity<?> removeTeacherFromCourse(@PathVariable Long course_id) {
         courseService.removeTeacher(course_id);
         return new ResponseEntity<>("course updated successfully", HttpStatus.ACCEPTED);
+    }
+
+    @GetMapping("/teacher/find-all-actives")
+    public ResponseEntity<List<TeacherResponseAddCourse>> teacherList() {
+        List<TeacherResponseAddCourse> teacherDtoList = new ArrayList<>();
+        List<Teacher> teachers = teacherService.findAll();
+        teachers.forEach(teacher -> {
+            if (teacher.getUser().getEnabled()) {
+                TeacherResponseAddCourse teacherDto = new TeacherResponseAddCourse();
+                BeanUtils.copyProperties(teacher, teacherDto);
+                teacherDto.setId(teacher.getId());
+                teacherDtoList.add(teacherDto);
+            }
+        });
+        return new ResponseEntity<>(teacherDtoList, HttpStatus.ACCEPTED);
     }
 
     @PutMapping("/course/add-student/{course_id}/{student_id}")

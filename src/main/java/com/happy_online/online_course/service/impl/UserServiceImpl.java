@@ -14,13 +14,9 @@ import com.happy_online.online_course.service.base.impl.BaseServiceImpl;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import javax.persistence.Transient;
+import javax.persistence.criteria.*;
+import java.util.*;
 
 @Service
 public class UserServiceImpl extends BaseServiceImpl<User, Long, UserRepository> implements UserService {
@@ -63,13 +59,14 @@ public class UserServiceImpl extends BaseServiceImpl<User, Long, UserRepository>
 
     @Override
     public List<User> findAll(UserSearchRequest userSearch) {
+        List<Role> roles = new ArrayList<>(userSearch.getRoles());
         return repository.findAll((root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             setName(predicates, root, criteriaBuilder, userSearch.getName());
             setLastname(predicates, root, criteriaBuilder, userSearch.getLastname());
-            setRole(predicates, root, criteriaBuilder, userSearch.getRoles());
+//            setRole(predicates, root, criteriaBuilder, roles.get(0));
             setNationalCode(predicates, root, criteriaBuilder, userSearch.getNationalCode());
-            setUsername(predicates, root, criteriaBuilder, userSearch.getUsername());
+            query.where(criteriaBuilder.isMember(roles.get(0), root.get("roles")));
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         });
     }
@@ -109,22 +106,16 @@ public class UserServiceImpl extends BaseServiceImpl<User, Long, UserRepository>
         return null;
     }
 
-    private void setRole(List<Predicate> predicates, Root<User> root, CriteriaBuilder criteriaBuilder, Set<Role> roles) {
-
-        if (roles != null) {
-            predicates.add(
-                    criteriaBuilder.like(root.get("role"), "%" + roles + "%")
-            );
-        }
-    }
-
-    private void setUsername(List<Predicate> predicates, Root<User> root, CriteriaBuilder criteriaBuilder, String username) {
-        if (username != null && !username.isBlank()) {
-            predicates.add(
-                    criteriaBuilder.like(root.get("username"), "%" + username + "%")
-            );
-        }
-    }
+//    private void setRole(List<Predicate> predicates, Root<User> root, CriteriaBuilder criteriaBuilder, Role role) {
+//
+//        if (role != null) {
+//
+//            Fetch<User, Role> fetchRoles = root.fetch("roles", JoinType.LEFT);
+//            predicates.add(
+//                    criteriaBuilder.equal()
+//            );
+//        }
+//    }
 
     private void setLastname(List<Predicate> predicates, Root<User> root, CriteriaBuilder criteriaBuilder, String lastname) {
         if (lastname != null && !lastname.isBlank()) {

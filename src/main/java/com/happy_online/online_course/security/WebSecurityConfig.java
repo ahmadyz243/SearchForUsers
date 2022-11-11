@@ -67,6 +67,7 @@ public class WebSecurityConfig {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeRequests()
                 .anyRequest().permitAll().and().formLogin().loginPage("/login").permitAll();
+
         http.formLogin().loginPage("/login").and().logout();
 //.antMatchers("/api/auth/**").permitAll()
         http.headers().frameOptions().sameOrigin();

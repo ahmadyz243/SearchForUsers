@@ -17,16 +17,15 @@ import java.util.Set;
 @Setter
 @Getter
 public class User extends BaseDomain<Long> {
-    @Column(unique = true)
+
     @NotBlank
     @Size(min = 5, max = 20)
     private String username;
 
-    @Column(unique = true)
     @NotBlank
     private String name;
 
-    @Column(unique = true)
+    
     @NotBlank
     private String lastname;
 

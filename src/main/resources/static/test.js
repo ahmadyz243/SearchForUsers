@@ -193,7 +193,6 @@ $(document).ready(function () {
         }
 
         function addCourse(masters) {
-            console.log(masters);
             var mastersCode = "";
             masters.forEach(master => {
                 mastersCode = mastersCode + ("<option value=\"" + master.id + "\">" + master.name + " " + master.lastname + "</option>")
@@ -272,7 +271,6 @@ $(document).ready(function () {
             })
 
             function search(userSearch) {
-
                 $.ajax({
                     url: "/api/admin/search",
                     method: "POST",
@@ -313,52 +311,24 @@ $(document).ready(function () {
         }
 
         $("#viewCourses").click(function () {
-            var courses = getCourses();
-            var coursesCode = "";
-            var masterCode = "";
-            var studentsCode = "";
-            var otherStudentsCode = "";
-            courses.forEach(course => {
-                coursesCode = coursesCode.concat("<button value=\"" + course.id + "\" class=\"course\">\
-                <span>" + course.title + "</span><span>" + course.beginDate + "</span><span>" + course.finishDate + "</span>\
-                </button>")
-            });
-            viewCourses(coursesCode, "", "", "");
-            $(".courseSpec").hide();
-            $(".course").click(function () {
-                var courseId = $(this).attr('value');
-                var course = getCourseById(courseId);
-                masterCode = "<div class=\"courseDetail\">\
-                <div class=\"name\">" + course.master.name + " " + course.master.lastname + "</div>\
-                <button id=\"removeMasterFromCourse\" value=\"" + course.id + "\">change master</button>\
-                </div>";
-                var students = course.students;
-                students.forEach(student => {
-                    studentsCode = studentsCode.concat("<div class=\"courseDetail\">\
-                    <div class=\"name\">" + student.name + " " + student.lastname + "</div>\
-                    <button id=\"removeStudentFromCourse\" value=\"" + student.id + "\">remove from course</button>\
-                    </div>")
-                });
-                var otherStudents = getStudentsNotInCourse(courseId);
-                otherStudents.forEach(s => {
-                    otherStudentsCode = otherStudentsCode.concat("<div class=\"courseDetail\">\
-                    <div class=\"details\">" + s.name + " " + s.lastname + "</div>\
-                    </div>")
-                });
-                viewCourses(coursesCode, masterCode, studentsCode, otherStudentsCode);
-                $(".courseSpec").show();
-            })
+            getCourses();
+
 
             function getCourses() {
-                var courses = [];
                 $.ajax({
-                    url: "",
+                    url: "/api/admin/course/find-all",
                     method: "GET",
                     contentType: "application/json",
                     dataType: "json",
                     success: function (response) {
-                        courses = response;
-                        return courses;
+                        var coursesCode = "";
+                        for (var i = 0; i < response.length; i++) {
+                            coursesCode = coursesCode.concat("<button value=\"" + response[i].id + "\" class=\"course\">\
+                            <span>" + response[i].title + "</span><span>" + response[i].startDate + "</span><span>" + response[i].endDate + "</span>\
+                            </button>");
+                        }
+                        viewCourses(coursesCode, "", "", "");
+                        $(".courseSpec").hide();
                     }, error: function (erorMessage) {
                         console.log(erorMessage);
                     }
@@ -366,19 +336,32 @@ $(document).ready(function () {
             }
 
             function getCourseById(id) {
-                var course;
+                var viewCourseCode = {
+                    masterCode: "",
+                    studentsCode: ""
+                };
                 $.ajax({
-                    url: "",
+                    url: "/api/admin/course/find-by-id/" + id,
                     method: "GET",
                     contentType: "application/json",
                     dataType: "json",
                     success: function (response) {
-                        course = response;
-                        return course;
+                        console.log(response);
+                        viewCourseCode.masterCode = "<div class=\"courseDetail\">\
+                        <div class=\"name\">" + response.teacherDto.name + " " + response.teacherDto.lastname + "</div>\
+                        <button id=\"removeMasterFromCourse\" value=\"" + response.id + "\">change master</button>\
+                        </div>";
+                        for (var i = 0; i < response.studentDtoList.length; i++) {
+                            viewCourseCode.studentsCode = viewCourseCode.studentsCode.concat("<div class=\"courseDetail\">\
+                    <div class=\"name\">" + response.studentDtoList[i].name + " " + response.studentDtoList[i].lastname + "</div>\
+                    <button id=\"removeStudentFromCourse\" value=\"" + response.studentDtoList[i].id + "\">remove from course</button>\
+                    </div>")
+                        }
                     }, error: function (erorMessage) {
                         console.log(erorMessage);
                     }
                 })
+                return viewCourseCode;
             }
 
             function getStudentsNotInCourse(courseId) {
@@ -419,6 +402,22 @@ $(document).ready(function () {
                     "</div>\
                     </div>\
                 ")
+                $(".course").click(function () {
+                    var courseId = $(this).attr('value');
+                    var viewCourseCode = getCourseById(courseId);
+                    console.log(viewCourseCode);
+                    var masterCode = viewCourseCode.masterCode;
+                    var studentsCode = viewCourseCode.studentsCode;
+                    var otherStudentsCode = "";
+                    // var otherStudents = getStudentsNotInCourse(courseId);
+                    // otherStudents.forEach(s => {
+                    //     otherStudentsCode = otherStudentsCode.concat("<div class=\"courseDetail\">\
+                    // <div class=\"details\">" + s.name + " " + s.lastname + "</div>\
+                    // </div>")
+                    // });
+                    viewCourses(coursesCode, masterCode, studentsCode, otherStudentsCode);
+                    $(".courseSpec").show();
+                })
             }
 
         })

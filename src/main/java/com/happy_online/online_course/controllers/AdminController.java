@@ -1,14 +1,12 @@
 package com.happy_online.online_course.controllers;
 
+import com.happy_online.online_course.models.Course;
 import com.happy_online.online_course.models.Teacher;
 import com.happy_online.online_course.models.User;
 import com.happy_online.online_course.payload.request.CreateCourseRequest;
 import com.happy_online.online_course.payload.request.UserSearchRequest;
 import com.happy_online.online_course.payload.request.UserUpdateRequest;
-import com.happy_online.online_course.payload.response.CourseInfoResponse;
-import com.happy_online.online_course.payload.response.MessageResponse;
-import com.happy_online.online_course.payload.response.TeacherResponseAddCourse;
-import com.happy_online.online_course.payload.response.UserInfoResponse;
+import com.happy_online.online_course.payload.response.*;
 import com.happy_online.online_course.service.CourseService;
 import com.happy_online.online_course.service.TeacherService;
 import com.happy_online.online_course.service.UserService;
@@ -103,10 +101,26 @@ public class AdminController {
     }
 
     @GetMapping("/course/find-all")
-    public ResponseEntity<List<CourseInfoResponse>> findAllCourses() {
-        List<CourseInfoResponse> courses = courseService.findAllPayload();
+    public ResponseEntity<List<ViewCoursesResponse>> findAllCourses() {
+        List<ViewCoursesResponse> courses = courseService.findAllPayload();
         System.out.println(courses.size());
-        return ResponseEntity.ok(courses);
+        return new ResponseEntity<>(courses, HttpStatus.ACCEPTED);
+    }
+
+    @GetMapping("/course/find-by-id/{id}")
+    public ResponseEntity<CourseDto> findCourseById(@PathVariable Long id){
+        Course course = courseService.findById(id);
+        CourseDto courseDto = new CourseDto();
+        courseDto.setId(id);
+        BeanUtils.copyProperties(course.getTeacher(), courseDto.getTeacherDto());
+        courseDto.getTeacherDto().setId(course.getTeacher().getId());
+        course.getStudentList().forEach(student -> {
+            StudentDto studentDto = new StudentDto();
+            BeanUtils.copyProperties(student, studentDto);
+            studentDto.setId(student.getId());
+            courseDto.getStudentDtoList().add(studentDto);
+        });
+        return new ResponseEntity<>(courseDto, HttpStatus.ACCEPTED);
     }
 
     @PostMapping("/search")

@@ -4,17 +4,16 @@ import com.happy_online.online_course.models.base.BaseDomain;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class Exam extends BaseDomain<Long> {
@@ -23,11 +22,30 @@ public class Exam extends BaseDomain<Long> {
     private Course course;
     @Column(nullable = false, name = "theTitle")
     private String title;
+
     @Column(nullable = false)
     private String description;
     @Column(nullable = false, name = "startsDate")
     private LocalDateTime startDateAndTime;
-    //it has to change because I just want to save clock in it
+
     @Column(nullable = false, name = "examTime")
-    private LocalDateTime time;
+    private Integer time;
+
+    public void setCourse(Course course) {
+        this.course = course;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setStartDateAndTime(LocalDateTime startDateAndTime) {
+        this.startDateAndTime = startDateAndTime;
+    }
+
+
 }

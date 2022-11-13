@@ -3,7 +3,11 @@ $(document).ready(function () {
         var masterRequests = [];
         var studentSignUpRequest = "";
         var masterRequest = "";
+        $("#donthaveaccount").click(function () {
+            window.location.href = "/signup";
+        })
         $(document).on("submit", "#loginform", function (event) {
+
             event.preventDefault();
             var username = $("#user").val();
             var password = $("#pass").val();
@@ -259,7 +263,7 @@ $(document).ready(function () {
                 var userSearch = {
                     name: firstname,
                     lastname: lastname,
-                    roles: [{name:role}],
+                    roles: [{name: role}],
                     nationalCode: nationalCode
                 }
                 console.log(userSearch);

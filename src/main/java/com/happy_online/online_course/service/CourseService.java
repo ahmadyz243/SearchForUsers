@@ -5,6 +5,7 @@ import com.happy_online.online_course.models.Teacher;
 import com.happy_online.online_course.payload.request.CreateCourseRequest;
 import com.happy_online.online_course.payload.response.CourseInfoResponse;
 import com.happy_online.online_course.payload.response.CourseInfoResponseTeacher;
+import com.happy_online.online_course.payload.response.ViewCoursesResponse;
 import com.happy_online.online_course.service.base.BaseService;
 
 import java.util.List;
@@ -20,7 +21,7 @@ public interface CourseService extends BaseService<Course, Long> {
 
     void removeStudent(Long course_id, Long student_id);
 
-    List<CourseInfoResponse> findAllPayload();
+    List<ViewCoursesResponse> findAllPayload();
 
     List<Course> findByTeacher(Teacher teacher);
     List<CourseInfoResponseTeacher> mapCourseToResponse(Teacher teacher);

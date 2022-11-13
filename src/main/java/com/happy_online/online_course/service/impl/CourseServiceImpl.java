@@ -7,6 +7,7 @@ import com.happy_online.online_course.models.Teacher;
 import com.happy_online.online_course.payload.request.CreateCourseRequest;
 import com.happy_online.online_course.payload.response.CourseInfoResponse;
 import com.happy_online.online_course.payload.response.CourseInfoResponseTeacher;
+import com.happy_online.online_course.payload.response.ViewCoursesResponse;
 import com.happy_online.online_course.repository.CourseRepository;
 import com.happy_online.online_course.service.CourseService;
 import com.happy_online.online_course.service.StudentService;
@@ -87,11 +88,16 @@ public class CourseServiceImpl extends BaseServiceImpl<Course, Long, CourseRepos
     }
 
     @Override
-    public List<CourseInfoResponse> findAllPayload() {
+    public List<ViewCoursesResponse> findAllPayload() {
         List<Course> courses = findAll();
-        List<CourseInfoResponse> courseInfoResponses = new ArrayList<>();
-        courses.forEach(course -> courseInfoResponses.add(convertCourseToResponse(course)));
-        return courseInfoResponses;
+        List<ViewCoursesResponse> viewCoursesResponses = new ArrayList<>();
+        courses.forEach(course -> {
+            ViewCoursesResponse courseDto = new ViewCoursesResponse();
+            BeanUtils.copyProperties(course, courseDto);
+            courseDto.setId(course.getId());
+            viewCoursesResponses.add(courseDto);
+        });
+        return viewCoursesResponses;
     }
 
     @Override

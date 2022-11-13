@@ -14,6 +14,8 @@ import com.happy_online.online_course.service.StudentService;
 import com.happy_online.online_course.service.TeacherService;
 import com.happy_online.online_course.service.base.impl.BaseServiceImpl;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
@@ -25,14 +27,19 @@ import java.util.Optional;
 
 @Service
 public class CourseServiceImpl extends BaseServiceImpl<Course, Long, CourseRepository> implements CourseService {
-    public CourseServiceImpl(CourseRepository repository, TeacherService teacherService, StudentService studentService) {
+    public CourseServiceImpl(CourseRepository repository, TeacherService teacherService) {
         super(repository);
         this.teacherService = teacherService;
-        this.studentService = studentService;
     }
 
     final TeacherService teacherService;
-    final StudentService studentService;
+    private StudentService studentService;
+
+    @Lazy
+    @Autowired
+    public void setStudentService(StudentService studentService) {
+        this.studentService = studentService;
+    }
 
     @Override
     @Transactional

@@ -3,6 +3,7 @@ $(document).ready(function () {
         var masterRequests = [];
         var studentSignUpRequest = "";
         var masterRequest = "";
+        var students;
         $("#donthaveaccount").click(function () {
             window.location.href = "/signup";
         })
@@ -313,7 +314,6 @@ $(document).ready(function () {
         $("#viewCourses").click(function () {
             getCourses();
 
-
             function getCourses() {
                 $.ajax({
                     url: "/api/admin/course/find-all",
@@ -335,28 +335,41 @@ $(document).ready(function () {
                 })
             }
 
+            let viewCourseCode = {
+                studentsCode: "",
+                masterCode: "",
+                otherStudents: ""
+            };
+
+
             function getCourseById(id) {
-                var viewCourseCode = {
-                    masterCode: "",
-                    studentsCode: ""
-                };
+
                 $.ajax({
                     url: "/api/admin/course/find-by-id/" + id,
+                    async: false,
                     method: "GET",
                     contentType: "application/json",
                     dataType: "json",
                     success: function (response) {
-                        console.log(response);
                         viewCourseCode.masterCode = "<div class=\"courseDetail\">\
+                        <div class=\"name\">" + response.teacherDto.name + " " + response.teacherDto.lastname + "</div>\
+                        <button id=\"removeMasterFromCourse\" value=\"" + response.id + "\">change master</button>\
+                        </div>";
+                        students = "<div class=\"courseDetail\">\
                         <div class=\"name\">" + response.teacherDto.name + " " + response.teacherDto.lastname + "</div>\
                         <button id=\"removeMasterFromCourse\" value=\"" + response.id + "\">change master</button>\
                         </div>";
                         for (var i = 0; i < response.studentDtoList.length; i++) {
                             viewCourseCode.studentsCode = viewCourseCode.studentsCode.concat("<div class=\"courseDetail\">\
-                    <div class=\"name\">" + response.studentDtoList[i].name + " " + response.studentDtoList[i].lastname + "</div>\
-                    <button id=\"removeStudentFromCourse\" value=\"" + response.studentDtoList[i].id + "\">remove from course</button>\
-                    </div>")
+                        <div class=\"name\">" + response.studentDtoList[i].name + " " + response.studentDtoList[i].lastname + "</div>\
+                        <button id=\"removeStudentFromCourse\" value=\"" + response.studentDtoList[i].id + "\">remove from course</button>\
+                        </div>");
                         }
+                        response.studentsNotInCourse.forEach(s => {
+                            viewCourseCode.otherStudents = viewCourseCode.otherStudents.concat("<div class=\"courseDetail\">\
+                    <div class=\"details\">" + s.name + " " + s.lastname + "</div>\
+                    </div>")
+                        });
                     }, error: function (erorMessage) {
                         console.log(erorMessage);
                     }
@@ -405,17 +418,11 @@ $(document).ready(function () {
                 $(".course").click(function () {
                     var courseId = $(this).attr('value');
                     var viewCourseCode = getCourseById(courseId);
-                    console.log(viewCourseCode);
-                    var masterCode = viewCourseCode.masterCode;
-                    var studentsCode = viewCourseCode.studentsCode;
+                    console.log(viewCourseCode.masterCode);
+                    console.log(viewCourseCode.studentsCode);
                     var otherStudentsCode = "";
-                    // var otherStudents = getStudentsNotInCourse(courseId);
-                    // otherStudents.forEach(s => {
-                    //     otherStudentsCode = otherStudentsCode.concat("<div class=\"courseDetail\">\
-                    // <div class=\"details\">" + s.name + " " + s.lastname + "</div>\
-                    // </div>")
-                    // });
-                    viewCourses(coursesCode, masterCode, studentsCode, otherStudentsCode);
+
+                    viewCourses(coursesCode, viewCourseCode.masterCode, viewCourseCode.studentsCode, viewCourseCode.otherStudents);
                     $(".courseSpec").show();
                 })
             }

@@ -8,6 +8,7 @@ import com.happy_online.online_course.payload.request.UserSearchRequest;
 import com.happy_online.online_course.payload.request.UserUpdateRequest;
 import com.happy_online.online_course.payload.response.*;
 import com.happy_online.online_course.service.CourseService;
+import com.happy_online.online_course.service.StudentService;
 import com.happy_online.online_course.service.TeacherService;
 import com.happy_online.online_course.service.UserService;
 import org.springframework.beans.BeanUtils;
@@ -29,10 +30,13 @@ public class AdminController {
 
     final TeacherService teacherService;
 
-    public AdminController(UserService userService, CourseService courseService, TeacherService teacherService) {
+    final StudentService studentService;
+
+    public AdminController(UserService userService, CourseService courseService, TeacherService teacherService, StudentService studentService) {
         this.userService = userService;
         this.courseService = courseService;
         this.teacherService = teacherService;
+        this.studentService = studentService;
     }
 
     @GetMapping("/user/not-actives")
@@ -53,7 +57,7 @@ public class AdminController {
         return ResponseEntity.ok(new MessageResponse("successfully activated"));
     }
 
-    @PostMapping(value = "/course/create",consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/course/create", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> createCourse(@RequestBody CreateCourseRequest courseRequest) {
         Teacher teacher = teacherService.findById(courseRequest.getMasterId());
         courseService.saveCourse(teacher, courseRequest);
@@ -107,11 +111,12 @@ public class AdminController {
         return new ResponseEntity<>(courses, HttpStatus.ACCEPTED);
     }
 
-    @GetMapping("/course/find-by-id/{id}")
-    public ResponseEntity<CourseDto> findCourseById(@PathVariable Long id){
-        Course course = courseService.findById(id);
+    @GetMapping("/course/find-by-id/{courseId}")
+    public ResponseEntity<CourseDto> findCourseById(@PathVariable Long courseId) {
+        Course course = courseService.findById(courseId);
         CourseDto courseDto = new CourseDto();
-        courseDto.setId(id);
+        courseDto.setId(courseId);
+        List<StudentDto> studentDtoList = studentService.findStudentsNotInCourse(courseId);
         BeanUtils.copyProperties(course.getTeacher(), courseDto.getTeacherDto());
         courseDto.getTeacherDto().setId(course.getTeacher().getId());
         course.getStudentList().forEach(student -> {
@@ -120,6 +125,7 @@ public class AdminController {
             studentDto.setId(student.getId());
             courseDto.getStudentDtoList().add(studentDto);
         });
+        courseDto.setStudentsNotInCourse(studentDtoList);
         return new ResponseEntity<>(courseDto, HttpStatus.ACCEPTED);
     }
 

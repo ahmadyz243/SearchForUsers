@@ -11,6 +11,8 @@ import com.happy_online.online_course.service.StudentService;
 import com.happy_online.online_course.service.TeacherService;
 import com.happy_online.online_course.service.UserService;
 import com.happy_online.online_course.service.base.impl.BaseServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
@@ -26,16 +28,21 @@ import java.util.Set;
 
 @Service
 public class UserServiceImpl extends BaseServiceImpl<User, Long, UserRepository> implements UserService {
-    public UserServiceImpl(UserRepository repository, RoleRepository roleRepository, StudentService studentService, TeacherService teacherService) {
+    public UserServiceImpl(UserRepository repository, RoleRepository roleRepository, TeacherService teacherService) {
         super(repository);
         this.roleRepository = roleRepository;
-        this.studentService = studentService;
         this.teacherService = teacherService;
     }
 
     final RoleRepository roleRepository;
-    final StudentService studentService;
+    private StudentService studentService;
     final TeacherService teacherService;
+
+    @Lazy
+    @Autowired
+    public void setStudentService(StudentService studentService) {
+        this.studentService = studentService;
+    }
 
     @Override
     public List<UserInfoResponse> notEnabledUsers(Boolean bool) {

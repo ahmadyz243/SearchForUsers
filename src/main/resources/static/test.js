@@ -3,7 +3,6 @@ $(document).ready(function () {
         var masterRequests = [];
         var studentSignUpRequest = "";
         var masterRequest = "";
-        var students;
         $("#donthaveaccount").click(function () {
             window.location.href = "/signup";
         })
@@ -312,8 +311,12 @@ $(document).ready(function () {
         }
 
         $("#viewCourses").click(function () {
+            let viewCourseCode = {
+                studentsCode: "",
+                masterCode: "",
+                otherStudents: "",
+            };
             getCourses();
-
             function getCourses() {
                 $.ajax({
                     url: "/api/admin/course/find-all",
@@ -334,65 +337,6 @@ $(document).ready(function () {
                     }
                 })
             }
-
-            let viewCourseCode = {
-                studentsCode: "",
-                masterCode: "",
-                otherStudents: ""
-            };
-
-
-            function getCourseById(id) {
-
-                $.ajax({
-                    url: "/api/admin/course/find-by-id/" + id,
-                    async: false,
-                    method: "GET",
-                    contentType: "application/json",
-                    dataType: "json",
-                    success: function (response) {
-                        viewCourseCode.masterCode = "<div class=\"courseDetail\">\
-                        <div class=\"name\">" + response.teacherDto.name + " " + response.teacherDto.lastname + "</div>\
-                        <button id=\"removeMasterFromCourse\" value=\"" + response.id + "\">change master</button>\
-                        </div>";
-                        students = "<div class=\"courseDetail\">\
-                        <div class=\"name\">" + response.teacherDto.name + " " + response.teacherDto.lastname + "</div>\
-                        <button id=\"removeMasterFromCourse\" value=\"" + response.id + "\">change master</button>\
-                        </div>";
-                        for (var i = 0; i < response.studentDtoList.length; i++) {
-                            viewCourseCode.studentsCode = viewCourseCode.studentsCode.concat("<div class=\"courseDetail\">\
-                        <div class=\"name\">" + response.studentDtoList[i].name + " " + response.studentDtoList[i].lastname + "</div>\
-                        <button id=\"removeStudentFromCourse\" value=\"" + response.studentDtoList[i].id + "\">remove from course</button>\
-                        </div>");
-                        }
-                        response.studentsNotInCourse.forEach(s => {
-                            viewCourseCode.otherStudents = viewCourseCode.otherStudents.concat("<div class=\"courseDetail\">\
-                    <div class=\"details\">" + s.name + " " + s.lastname + "</div>\
-                    </div>")
-                        });
-                    }, error: function (erorMessage) {
-                        console.log(erorMessage);
-                    }
-                })
-                return viewCourseCode;
-            }
-
-            function getStudentsNotInCourse(courseId) {
-                var students = [];
-                $.ajax({
-                    url: "",
-                    method: "GET",
-                    contentType: "application/json",
-                    dataType: "json",
-                    success: function (response) {
-                        students = response;
-                        return students;
-                    }, error: function (erorMessage) {
-                        console.log(erorMessage);
-                    }
-                })
-            }
-
             function viewCourses(coursesCode, masterCode, studentsCode, otherStudentsCode) {
                 $("article").html("\
                 <div class=\"coursesContainer\">\
@@ -410,20 +354,124 @@ $(document).ready(function () {
                     studentsCode +
                     "</div>\
                     <div class=\"courseDetails courseSpec\">\
-                    <button id=\"addNewStudentToCourse\"><b>add another student</b></button>" +
+                    <button id=\"addNewStudentToCourse\" value=''><b>add another student</b></button>" +
                     otherStudentsCode +
                     "</div>\
                     </div>\
                 ")
                 $(".course").click(function () {
                     var courseId = $(this).attr('value');
-                    var viewCourseCode = getCourseById(courseId);
-                    console.log(viewCourseCode.masterCode);
-                    console.log(viewCourseCode.studentsCode);
-                    var otherStudentsCode = "";
-
+                    viewCourseCode = getCourseById(courseId);
+                    console.log(viewCourseCode)
                     viewCourses(coursesCode, viewCourseCode.masterCode, viewCourseCode.studentsCode, viewCourseCode.otherStudents);
                     $(".courseSpec").show();
+                    //$("#otherMasters").hide();
+                    $("#changeMasterForThisCourse").hide();
+                    $("#changeMaster").click(function (){
+                        //$("#otherMasters").show();
+                        $("#changeMasterForThisCourse").show();
+                    })
+                    $("#changeMasterForThisCourse").click(function (){
+                        var newMasterId = $("#otherMasters").val();
+                        changeCourseMasteer(courseId, newMasterId);
+                    })
+                    $("#removeStudentFromCourse").click(function (){
+                        var studentId = $(this).attr('value');
+                        removeStudentFromCourse(courseId, studentId);
+                    })
+                    $(".otherStudent").click(function (){
+                        $("#addNewStudentToCourse").val($(this).attr('value'));
+                        $(".otherStudent").css("background", "rgb(150, 17, 162)");
+                        $(this).css("background", "rgb(102,7,108)");
+                    })
+                    $("#addNewStudentToCourse").click(function (){
+                        var newStudentId = $(this).val();
+                        if(newStudentId != null){
+                            addStudentToCourse(courseId, newStudentId);
+                        }else {
+                            alert("please select a student first!");
+                        }
+                    })
+                })
+            }
+            function getCourseById(id) {
+                $.ajax({
+                    url: "/api/admin/course/find-by-id/" + id,
+                    async: false,
+                    method: "GET",
+                    contentType: "application/json",
+                    dataType: "json",
+                    success: function (response) {
+                        // var otherMastersCode = "<select id='otherMasters'>";
+                        // for (var i = 0; i < response.teachersNotInCourse.length; i++) {
+                        //     otherMastersCode = otherMastersCode.concat("<option value='" + response.teachersNotInCourse[i].id + "'>"
+                        //         + response.teachersNotInCourse[i].name + " " + response.teachersNotInCourse[i].lastname + "</option>")
+                        // }
+                        //otherMastersCode = otherMastersCode.concat("</select>");
+                        viewCourseCode.masterCode = "<div class=\"courseDetail\">\
+                        <div class=\"name\">" + response.teacherDto.name + " " + response.teacherDto.lastname + "</div>\
+                        <button id=\"changeMaster\" value=\"" + response.teacherDto.id + "\">change</button>" +
+                        //otherMastersCode +
+                        "<button id=\"changeMasterForThisCourse\" value=\"" + response.teacherDto.id + "\">ok</button>\
+                        </div>";
+                        console.log(response);
+                        console.log(viewCourseCode.masterCode);
+                        for (var j = 0; j < response.studentDtoList.length; j++) {
+                            viewCourseCode.studentsCode = viewCourseCode.studentsCode.concat("<div class=\"courseDetail\">\
+                        <div class=\"name\">" + response.studentDtoList[j].name + " " + response.studentDtoList[j].lastname + "</div>\
+                        <button id=\"removeStudentFromCourse\" value=\"" + response.studentDtoList[j].id + "\">remove from course</button>\
+                        </div>");
+                        }
+                        response.studentsNotInCourse.forEach(s => {
+                            viewCourseCode.otherStudents = viewCourseCode.otherStudents.concat("<button class=\"courseDetail otherStudent\" value=\"" + s.id + "\">\
+                    <div class=\"details\">" + s.name + " " + s.lastname + "</div>\
+                    </button>")
+                        });
+                    }, error: function (erorMessage) {
+                        console.log(erorMessage);
+                    }
+                })
+                return viewCourseCode;
+            }
+
+            function changeCourseMasteer(courseId, newMasterId){
+                $.ajax({
+                    url: "" + courseId + "/" + newMasterId,
+                    method: "POST",
+                    contentType: "application/json",
+                    dataType: "json",
+                    success: function (response) {
+                        alert("master for this course has changed...");
+                    }, error: function (erorMessage) {
+                        console.log(erorMessage);
+                    }
+                })
+            }
+
+            function addStudentToCourse(courseId, newStudentId){
+                $.ajax({
+                    url: "" + courseId + "/" + newStudentId,
+                    method: "POST",
+                    contentType: "application/json",
+                    dataType: "json",
+                    success: function (response) {
+                        alert("student added to this course");
+                    }, error: function (erorMessage) {
+                        console.log(erorMessage);
+                    }
+                })
+            }
+            function removeStudentFromCourse(courseId, studentId){
+                $.ajax({
+                    url: "" + courseId + "/" + studentId,
+                    method: "POST",
+                    contentType: "application/json",
+                    dataType: "json",
+                    success: function (response) {
+                        alert("student removed from this course");
+                    }, error: function (erorMessage) {
+                        console.log(erorMessage);
+                    }
                 })
             }
 

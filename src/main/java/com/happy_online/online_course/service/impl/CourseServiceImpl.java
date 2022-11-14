@@ -27,13 +27,18 @@ import java.util.Optional;
 
 @Service
 public class CourseServiceImpl extends BaseServiceImpl<Course, Long, CourseRepository> implements CourseService {
-    public CourseServiceImpl(CourseRepository repository, TeacherService teacherService) {
+    public CourseServiceImpl(CourseRepository repository) {
         super(repository);
-        this.teacherService = teacherService;
     }
 
-    final TeacherService teacherService;
+    private TeacherService teacherService;
     private StudentService studentService;
+
+    @Lazy
+    @Autowired
+    public void setTeacherService(TeacherService teacherService) {
+        this.teacherService = teacherService;
+    }
 
     @Lazy
     @Autowired
@@ -50,13 +55,15 @@ public class CourseServiceImpl extends BaseServiceImpl<Course, Long, CourseRepos
     }
 
     @Override
+    @Transactional
     public void addTeacher(Long courseId, Long TeacherId) {
         Course course = findById(courseId);
-        if (course.getTeacher() == null) {
-            Teacher teacher = teacherService.findById(TeacherId);
-            course.setTeacher(teacher);
-            // TODO: 11/4/2022 change the exception 
-        } else throw new BadCredentialsException("course already has a teacher");
+        Teacher teacher = teacherService.findById(TeacherId);
+        // TODO: 11/14/2022 change the exception
+        if (teacher == null)
+            throw new NotFoundException("teacher not found");
+        course.setTeacher(teacher);
+        repository.save(course);
     }
 
     @Override

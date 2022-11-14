@@ -1,7 +1,6 @@
 package com.happy_online.online_course.service.base.impl;
 
 import com.happy_online.online_course.exception.NotFoundException;
-import com.happy_online.online_course.models.User;
 import com.happy_online.online_course.models.base.BaseDomain;
 import com.happy_online.online_course.service.base.BaseService;
 import lombok.AllArgsConstructor;
@@ -31,6 +30,10 @@ public class BaseServiceImpl<E extends BaseDomain<ID>,
         return repository.findAll();
     }
 
+    @Override
+    public void delete(E e) {
+        repository.delete(e);
+    }
 
 
 }

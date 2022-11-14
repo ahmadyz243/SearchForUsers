@@ -65,7 +65,7 @@ public class AdminController {
         return new ResponseEntity<>("course created", HttpStatus.CREATED);
     }
 
-    @PutMapping("/course/add-teacher/{course_id}/{teacher_id}")
+    @PutMapping(value = "/course/add-teacher/{course_id}/{teacher_id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> addTeacherToCourse(@PathVariable Long course_id, @PathVariable Long teacher_id) {
         courseService.addTeacher(course_id, teacher_id);
         return new ResponseEntity<>("teacher added successfully", HttpStatus.ACCEPTED);
@@ -116,6 +116,7 @@ public class AdminController {
         Course course = courseService.findById(courseId);
         CourseDto courseDto = new CourseDto();
         courseDto.setId(courseId);
+        List<TeacherDto> teachersNotInCourse = teacherService.teachersNotInCourse(courseId);
         List<StudentDto> studentDtoList = studentService.findStudentsNotInCourse(courseId);
         BeanUtils.copyProperties(course.getTeacher(), courseDto.getTeacherDto());
         courseDto.getTeacherDto().setId(course.getTeacher().getId());
@@ -125,6 +126,7 @@ public class AdminController {
             studentDto.setId(student.getId());
             courseDto.getStudentDtoList().add(studentDto);
         });
+        courseDto.setTeachersNotInCourse(teachersNotInCourse);
         courseDto.setStudentsNotInCourse(studentDtoList);
         return new ResponseEntity<>(courseDto, HttpStatus.ACCEPTED);
     }

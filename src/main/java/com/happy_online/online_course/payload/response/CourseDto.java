@@ -1,5 +1,6 @@
 package com.happy_online.online_course.payload.response;
 
+import com.happy_online.online_course.models.Teacher;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -18,5 +19,6 @@ public class CourseDto {
     private TeacherDto teacherDto = new TeacherDto();
     private List<StudentDto> studentDtoList = new ArrayList<>();
     private List<StudentDto> studentsNotInCourse = new ArrayList<>();
+    private List<TeacherDto> teachersNotInCourse = new ArrayList<>();
 
 }

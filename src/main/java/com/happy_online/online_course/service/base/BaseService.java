@@ -11,4 +11,5 @@ public interface BaseService<E extends BaseDomain<ID>, ID extends Serializable> 
 
     List<E> findAll();
 
+    void delete(E e);
 }

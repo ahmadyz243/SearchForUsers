@@ -3,6 +3,7 @@ package com.happy_online.online_course.service.impl;
 import com.happy_online.online_course.models.Course;
 import com.happy_online.online_course.models.Exam;
 import com.happy_online.online_course.payload.request.ExamCreateRequest;
+import com.happy_online.online_course.payload.response.ExamResponseForUpdate;
 import com.happy_online.online_course.repository.ExamRepository;
 import com.happy_online.online_course.service.CourseService;
 import com.happy_online.online_course.service.ExamService;
@@ -32,6 +33,23 @@ public class ExamServiceImpl extends BaseServiceImpl<Exam, Long, ExamRepository>
         Exam exam = mapCreateReqToExam(examCreateRequest);
         exam.setCourse(course);
         return repository.save(exam);
+    }
+
+    @Override
+    public ExamResponseForUpdate findByIdResponse(Long exam_id) {
+        Exam exam = findById(exam_id);
+        return mapExamToResponse(exam);
+    }
+
+    @Override
+    public Exam save(Exam exam) {
+        return repository.save(exam);
+    }
+
+    private ExamResponseForUpdate mapExamToResponse(Exam exam) {
+        ExamResponseForUpdate response = new ExamResponseForUpdate();
+        BeanUtils.copyProperties(exam, response);
+        return response;
     }
 
     private Exam mapCreateReqToExam(ExamCreateRequest examCreateRequest) {

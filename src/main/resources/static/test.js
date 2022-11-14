@@ -3,6 +3,7 @@ $(document).ready(function () {
         var masterRequests = [];
         var studentSignUpRequest = "";
         var masterRequest = "";
+        var coursesCode = "";
         $("#donthaveaccount").click(function () {
             window.location.href = "/signup";
         })
@@ -317,6 +318,7 @@ $(document).ready(function () {
                 otherStudents: "",
             };
             getCourses();
+
             function getCourses() {
                 $.ajax({
                     url: "/api/admin/course/find-all",
@@ -324,7 +326,6 @@ $(document).ready(function () {
                     contentType: "application/json",
                     dataType: "json",
                     success: function (response) {
-                        var coursesCode = "";
                         for (var i = 0; i < response.length; i++) {
                             coursesCode = coursesCode.concat("<button value=\"" + response[i].id + "\" class=\"course\">\
                             <span>" + response[i].title + "</span><span>" + response[i].startDate + "</span><span>" + response[i].endDate + "</span>\
@@ -337,6 +338,7 @@ $(document).ready(function () {
                     }
                 })
             }
+
             function viewCourses(coursesCode, masterCode, studentsCode, otherStudentsCode) {
                 $("article").html("\
                 <div class=\"coursesContainer\">\
@@ -361,39 +363,10 @@ $(document).ready(function () {
                 ")
                 $(".course").click(function () {
                     var courseId = $(this).attr('value');
-                    viewCourseCode = getCourseById(courseId);
-                    console.log(viewCourseCode)
-                    viewCourses(coursesCode, viewCourseCode.masterCode, viewCourseCode.studentsCode, viewCourseCode.otherStudents);
-                    $(".courseSpec").show();
-                    //$("#otherMasters").hide();
-                    $("#changeMasterForThisCourse").hide();
-                    $("#changeMaster").click(function (){
-                        //$("#otherMasters").show();
-                        $("#changeMasterForThisCourse").show();
-                    })
-                    $("#changeMasterForThisCourse").click(function (){
-                        var newMasterId = $("#otherMasters").val();
-                        changeCourseMasteer(courseId, newMasterId);
-                    })
-                    $("#removeStudentFromCourse").click(function (){
-                        var studentId = $(this).attr('value');
-                        removeStudentFromCourse(courseId, studentId);
-                    })
-                    $(".otherStudent").click(function (){
-                        $("#addNewStudentToCourse").val($(this).attr('value'));
-                        $(".otherStudent").css("background", "rgb(150, 17, 162)");
-                        $(this).css("background", "rgb(102,7,108)");
-                    })
-                    $("#addNewStudentToCourse").click(function (){
-                        var newStudentId = $(this).val();
-                        if(newStudentId != null){
-                            addStudentToCourse(courseId, newStudentId);
-                        }else {
-                            alert("please select a student first!");
-                        }
-                    })
+                    viewSingleCourse(courseId);
                 })
             }
+
             function getCourseById(id) {
                 $.ajax({
                     url: "/api/admin/course/find-by-id/" + id,
@@ -402,17 +375,17 @@ $(document).ready(function () {
                     contentType: "application/json",
                     dataType: "json",
                     success: function (response) {
-                        // var otherMastersCode = "<select id='otherMasters'>";
-                        // for (var i = 0; i < response.teachersNotInCourse.length; i++) {
-                        //     otherMastersCode = otherMastersCode.concat("<option value='" + response.teachersNotInCourse[i].id + "'>"
-                        //         + response.teachersNotInCourse[i].name + " " + response.teachersNotInCourse[i].lastname + "</option>")
-                        // }
-                        //otherMastersCode = otherMastersCode.concat("</select>");
+                        var otherMastersCode = "<select id='otherMasters'>";
+                        for (var i = 0; i < response.teachersNotInCourse.length; i++) {
+                            otherMastersCode = otherMastersCode.concat("<option value='" + response.teachersNotInCourse[i].id + "'>"
+                                + response.teachersNotInCourse[i].name + " " + response.teachersNotInCourse[i].lastname + "</option>")
+                        }
+                        otherMastersCode = otherMastersCode.concat("</select>");
                         viewCourseCode.masterCode = "<div class=\"courseDetail\">\
                         <div class=\"name\">" + response.teacherDto.name + " " + response.teacherDto.lastname + "</div>\
                         <button id=\"changeMaster\" value=\"" + response.teacherDto.id + "\">change</button>" +
-                        //otherMastersCode +
-                        "<button id=\"changeMasterForThisCourse\" value=\"" + response.teacherDto.id + "\">ok</button>\
+                            otherMastersCode +
+                            "<button id=\"changeMasterForThisCourse\" value=\"" + response.teacherDto.id + "\">ok</button>\
                         </div>";
                         console.log(response);
                         console.log(viewCourseCode.masterCode);
@@ -434,13 +407,47 @@ $(document).ready(function () {
                 return viewCourseCode;
             }
 
-            function changeCourseMasteer(courseId, newMasterId){
+            function viewSingleCourse(courseId) {
+                viewCourseCode = getCourseById(courseId);
+                console.log(viewCourseCode)
+                viewCourses(coursesCode, viewCourseCode.masterCode, viewCourseCode.studentsCode, viewCourseCode.otherStudents);
+                $(".courseSpec").show();
+                $("#otherMasters").hide();
+                $("#changeMasterForThisCourse").hide();
+                $("#changeMaster").click(function () {
+                    $("#otherMasters").show();
+                    $("#changeMasterForThisCourse").show();
+                })
+                $("#changeMasterForThisCourse").click(function () {
+                    var newMasterId = $("#otherMasters").val();
+                    changeCourseMasteer(courseId, newMasterId);
+                })
+                $("#removeStudentFromCourse").click(function () {
+                    var studentId = $(this).attr('value');
+                    removeStudentFromCourse(courseId, studentId);
+                })
+                $(".otherStudent").click(function () {
+                    $("#addNewStudentToCourse").val($(this).attr('value'));
+                    $(".otherStudent").css("background", "rgb(150, 17, 162)");
+                    $(this).css("background", "rgb(102,7,108)");
+                })
+                $("#addNewStudentToCourse").click(function () {
+                    var newStudentId = $(this).val();
+                    if (newStudentId != null) {
+                        addStudentToCourse(courseId, newStudentId);
+                    } else {
+                        alert("please select a student first!");
+                    }
+                })
+            }
+
+            function changeCourseMasteer(courseId, newMasterId) {
                 $.ajax({
-                    url: "" + courseId + "/" + newMasterId,
-                    method: "POST",
+                    url: "/api/admin/course/add-teacher/" + courseId + "/" + newMasterId,
+                    method: "PUT",
                     contentType: "application/json",
-                    dataType: "json",
                     success: function (response) {
+                        viewSingleCourse(courseId);
                         alert("master for this course has changed...");
                     }, error: function (erorMessage) {
                         console.log(erorMessage);
@@ -448,7 +455,7 @@ $(document).ready(function () {
                 })
             }
 
-            function addStudentToCourse(courseId, newStudentId){
+            function addStudentToCourse(courseId, newStudentId) {
                 $.ajax({
                     url: "" + courseId + "/" + newStudentId,
                     method: "POST",
@@ -461,7 +468,8 @@ $(document).ready(function () {
                     }
                 })
             }
-            function removeStudentFromCourse(courseId, studentId){
+
+            function removeStudentFromCourse(courseId, studentId) {
                 $.ajax({
                     url: "" + courseId + "/" + studentId,
                     method: "POST",
@@ -500,5 +508,6 @@ $(document).ready(function () {
         $(".masterCourse").click(function () {
             $("article").html("<p>hiiiiiiiiiiiiiiiiiiii</p>")
         })
+
     }
 )

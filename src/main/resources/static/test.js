@@ -37,6 +37,45 @@ $(document).ready(function () {
                 }
             })
         })
+
+        //GET TEACHER COURSES LIST
+
+        $("#viewTeacherCourses").click(function () {
+            var teacherCourses = getTeacherCoursesByUserName();
+
+            viewTeacherCourses(teacherCourses);
+        })
+
+        function viewTeacherCourses(teacherCourses) {
+            var teacherCoursesCode = "";
+            for (let i = 0; i < teacherCourses.length; i++) {
+                teacherCoursesCode = teacherCoursesCode.concat(" <div class=\"masterCourse\">\n" +
+                    "        <span>" + teacherCourses[i].title + "</span>\n" +
+                    "        <span>" + teacherCourses[i].startDate + "</span>\n" +
+                    "        <span>" + teacherCourses[i].endDate + "</span>\n" +
+                    "    </div>")
+            }
+            $("article").html(teacherCoursesCode);
+        }
+
+        function getTeacherCoursesByUserName() {
+            var teacherCourses = [];
+            $.ajax({
+                url: "/api/teacher/course/find",
+                method: "GET",
+                contentType: "application/json",
+                async: false,
+                dataType: "json",
+                success: function (response) {
+                    teacherCourses = response;
+                },
+                error: function (erorMessage) {
+                    console.log(erorMessage);
+                }
+            })
+            return teacherCourses;
+        }
+
         //SIGNUP---------------------------------------------------------
         $("#signup").click(function (event) {
             event.preventDefault();
@@ -312,6 +351,7 @@ $(document).ready(function () {
         }
 
         $("#viewCourses").click(function () {
+            coursesCode = "";
             let viewCourseCode = {
                 studentsCode: "",
                 masterCode: "",
@@ -408,6 +448,9 @@ $(document).ready(function () {
             }
 
             function viewSingleCourse(courseId) {
+                viewCourseCode.otherStudents = "";
+                viewCourseCode.studentsCode = "";
+                viewCourseCode.masterCode = "";
                 viewCourseCode = getCourseById(courseId);
                 console.log(viewCourseCode)
                 viewCourses(coursesCode, viewCourseCode.masterCode, viewCourseCode.studentsCode, viewCourseCode.otherStudents);
@@ -425,6 +468,7 @@ $(document).ready(function () {
                 $("#removeStudentFromCourse").click(function () {
                     var studentId = $(this).attr('value');
                     removeStudentFromCourse(courseId, studentId);
+                    viewSingleCourse(courseId);
                 })
                 $(".otherStudent").click(function () {
                     $("#addNewStudentToCourse").val($(this).attr('value'));
@@ -457,10 +501,9 @@ $(document).ready(function () {
 
             function addStudentToCourse(courseId, newStudentId) {
                 $.ajax({
-                    url: "" + courseId + "/" + newStudentId,
-                    method: "POST",
+                    url: "/api/admin/course/add-student/" + courseId + "/" + newStudentId,
+                    method: "PUT",
                     contentType: "application/json",
-                    dataType: "json",
                     success: function (response) {
                         alert("student added to this course");
                     }, error: function (erorMessage) {
@@ -471,10 +514,9 @@ $(document).ready(function () {
 
             function removeStudentFromCourse(courseId, studentId) {
                 $.ajax({
-                    url: "" + courseId + "/" + studentId,
-                    method: "POST",
+                    url: "/api/admin/course/remove-student/" + courseId + "/" + studentId,
+                    method: "DELETE",
                     contentType: "application/json",
-                    dataType: "json",
                     success: function (response) {
                         alert("student removed from this course");
                     }, error: function (erorMessage) {

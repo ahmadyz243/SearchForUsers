@@ -18,12 +18,14 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Question extends BaseDomain<Long> {
-    // its optional
-    @Column(nullable = true)
     @OneToMany(mappedBy = "question")
     private List<QuestionItem> questionItemList;
+
+    @ManyToOne
+    private Course course;
     @ManyToOne
     private Teacher teacher;
+
     @Column(nullable = false)
     private String question;
 }

@@ -1,11 +1,11 @@
 package com.happy_online.online_course.controllers;
 
+import com.happy_online.online_course.models.Course;
 import com.happy_online.online_course.models.Exam;
 import com.happy_online.online_course.models.Teacher;
 import com.happy_online.online_course.payload.request.ExamCreateRequest;
 import com.happy_online.online_course.payload.request.ExamUpdateRequest;
-import com.happy_online.online_course.payload.response.CourseInfoResponseTeacher;
-import com.happy_online.online_course.payload.response.ExamResponseForUpdate;
+import com.happy_online.online_course.payload.response.*;
 import com.happy_online.online_course.service.CourseService;
 import com.happy_online.online_course.service.ExamService;
 import com.happy_online.online_course.service.TeacherService;
@@ -16,6 +16,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -69,5 +70,21 @@ public class TeacherController {
         ExamResponseForUpdate examResponseForUpdate = new ExamResponseForUpdate();
         BeanUtils.copyProperties(updated, examResponseForUpdate);
         return new ResponseEntity<>(examResponseForUpdate, HttpStatus.ACCEPTED);
+    }
+
+    @GetMapping("/course/find")
+    public ResponseEntity<List<TeacherCourseResponse>> findTeacherCourses() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        Teacher teacher = teacherService.findByUsername(username);
+        List<Course> courses = teacher.getCourseList();
+        List<TeacherCourseResponse> responseTeachers = new ArrayList<>();
+        courses.forEach(course -> {
+            TeacherCourseResponse courseInfoResponse = new TeacherCourseResponse();
+            BeanUtils.copyProperties(course, courseInfoResponse);
+            courseInfoResponse.setId(course.getId());
+            courseInfoResponse.setEnabled(course.getActive());
+            responseTeachers.add(courseInfoResponse);
+        });
+        return new ResponseEntity<>(responseTeachers, HttpStatus.ACCEPTED);
     }
 }

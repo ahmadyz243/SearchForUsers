@@ -92,13 +92,13 @@ public class AdminController {
         return new ResponseEntity<>(teacherDtoList, HttpStatus.ACCEPTED);
     }
 
-    @PutMapping("/course/add-student/{course_id}/{student_id}")
+    @PutMapping(value = "/course/add-student/{course_id}/{student_id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> addStudentToCourse(@PathVariable Long course_id, @PathVariable Long student_id) {
         courseService.addStudent(course_id, student_id);
         return new ResponseEntity<>("student added successfully", HttpStatus.ACCEPTED);
     }
 
-    @PutMapping("/course/remove-student/{course_id}/{student_id}")
+    @DeleteMapping(value = "/course/remove-student/{course_id}/{student_id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> removeStudentFromCourse(@PathVariable Long course_id, @PathVariable Long student_id) {
         courseService.removeStudent(course_id, student_id);
         return new ResponseEntity<>("student removed successfully", HttpStatus.ACCEPTED);

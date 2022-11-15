@@ -17,11 +17,14 @@ import javax.persistence.OneToOne;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ExamQuestion extends BaseDomain<Long> {
+
     @JoinColumn(nullable = false)
     @OneToOne
     private Question question;
+
     @Column(nullable = false)
     private Double score;
+
     @Column(nullable = false, name = "questionNumber")
     private Integer number;
 }

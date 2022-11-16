@@ -8,7 +8,6 @@ $(document).ready(function () {
             window.location.href = "/signup";
         })
         $(document).on("submit", "#loginform", function (event) {
-
             event.preventDefault();
             var username = $("#user").val();
             var password = $("#pass").val();
@@ -16,7 +15,6 @@ $(document).ready(function () {
                 username: username,
                 password: password
             }
-
             $.ajax({
                 url: "/api/auth/signin",
                 method: "POST",
@@ -38,22 +36,108 @@ $(document).ready(function () {
             })
         })
 
+        // MASTER ---------------------------------------------------------------------------
         //GET TEACHER COURSES LIST
-
         $("#viewTeacherCourses").click(function () {
             var teacherCourses = getTeacherCoursesByUserName();
-
             viewTeacherCourses(teacherCourses);
+            $(".masterCourse").hover(function () {
+                $(this).css("background", "rgb(2, 45, 2)");
+            }, function () {
+                $(this).css("background", "rgb(0, 128, 0)");
+            });
+            $(".masterCourse").click(function () {
+                var courseId = $(this).attr('value');
+                var teacherCourse = getTeacherCourse(courseId);
+                viewTeacherCourse(teacherCourse);
+                $("#addTestButton").click(function (){
+                    addNewExam();
+                })
+            })
         })
+
+        function addNewExam(){
+            $("article").html("<form id=\"newExamForm\">\n" +
+                "        <div>exam time(per minute):<br><input id='time' type=\"number\" max=\"180\" min=\"1\" placeholder=\"time\"></div>\n" +
+                "        <div>title:<br><input id=\"title\" type=\"text\" placeholder=\"title\"></div>\n" +
+                "        <div>description:<br><textarea id=\"description\" placeholder=\"description\"></textarea></div>\n" +
+                "        <input type=\"submit\" value=\"save\">\n" +
+                "    </form>")
+            $("#newExamForm").submit(function (event){
+                event.preventDefault();
+                var exam = {
+                    time: 1,
+                    title: "",
+                    description: ""
+                }
+                exam.time = $("#time");
+                exam.title = $("#title");
+                exam.description = $("#description");
+                $.ajax({
+                    url: "",
+                    method: "POST",
+                    contentType: "application/json",
+                    dataType: "json",
+                    data: JSON.stringify(exam),
+                    success: function (response) {
+                        console.log(response);
+                        alert("exam saved successfully");
+                    },
+                    error: function (erorMessage) {
+                        console.log(erorMessage);
+                    }
+                })
+            })
+        }
+
+        function viewTeacherCourse(course) {
+            var exams = course.exams;
+            var viewTeacherCourseCode = "<section>\n" +
+                "                    <button id=\"addTestButton\">\n" +
+                "                        <svg xmlns=\"http://www.w3.org/2000/svg\" class=\"bi bi-file-earmark-plus\" viewBox=\"0 0 16 16\">\n" +
+                "                            <path\n" +
+                "                                d=\"M8 6.5a.5.5 0 0 1 .5.5v1.5H10a.5.5 0 0 1 0 1H8.5V11a.5.5 0 0 1-1 0V9.5H6a.5.5 0 0 1 0-1h1.5V7a.5.5 0 0 1 .5-.5z\"/>\n" +
+                "                            <path\n" +
+                "                                d=\"M14 4.5V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h5.5L14 4.5zm-3 0A1.5 1.5 0 0 1 9.5 3V1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V4.5h-2z\"/>\n" +
+                "                        </svg>\n" +
+                "                    </button>";
+            for (var i = 0; i < exams.length; i++) {
+                viewTeacherCourseCode = viewTeacherCourseCode.concat("<button class=\"test\" name=\"testId\" value=\"" + exams[i].id +"\">\n" +
+                    "                        <p><b>" + exams[i].title +"</b></p>\n" +
+                    "                        <p>" + exams[i].time + "</p>\n" +
+                    "                    </button>");
+            }
+            viewTeacherCourseCode = viewTeacherCourseCode.concat("</section>");
+            $("article").html(viewTeacherCourseCode);
+        }
+
+        function getTeacherCourse(courseId) {
+            var teacherCourse;
+            $.ajax({
+                url: "" + courseId,
+                method: "GET",
+                contentType: "application/json",
+                async: false,
+                dataType: "json",
+                success: function (response) {
+                    console.log(response);
+                    teacherCourse = response;
+                },
+                error: function (erorMessage) {
+                    console.log(erorMessage);
+                }
+            })
+            return teacherCourse;
+        }
 
         function viewTeacherCourses(teacherCourses) {
             var teacherCoursesCode = "";
             for (let i = 0; i < teacherCourses.length; i++) {
-                teacherCoursesCode = teacherCoursesCode.concat(" <div class=\"masterCourse\">\n" +
+                teacherCoursesCode = teacherCoursesCode.concat(" <button class=\"masterCourse\" value=\"" + teacherCourses[i].id + "\">\n" +
                     "        <span>" + teacherCourses[i].title + "</span>\n" +
                     "        <span>" + teacherCourses[i].startDate + "</span>\n" +
                     "        <span>" + teacherCourses[i].endDate + "</span>\n" +
-                    "    </div>")
+                    "    </button>")
             }
             $("article").html(teacherCoursesCode);
         }
@@ -538,17 +622,6 @@ $(document).ready(function () {
                 }
             })
 
-        })
-
-        // MASTER ---------------------------------------------------------------------------
-        $(".masterCourse").hover(function () {
-            $(this).css("background", "rgb(2, 45, 2)");
-        }, function () {
-            $(this).css("background", "rgb(0, 128, 0)");
-        });
-
-        $(".masterCourse").click(function () {
-            $("article").html("<p>hiiiiiiiiiiiiiiiiiiii</p>")
         })
 
     }

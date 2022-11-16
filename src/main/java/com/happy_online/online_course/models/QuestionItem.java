@@ -19,7 +19,5 @@ public class QuestionItem extends BaseDomain<Long> {
     @ManyToOne
     private Question question;
     @Column(nullable = false)
-    private String description;
-    @Column(nullable = false)
-    private String title;
+    private String answer;
 }

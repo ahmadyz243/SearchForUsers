@@ -39,7 +39,7 @@ $(document).ready(function () {
         // MASTER ---------------------------------------------------------------------------
         //GET TEACHER COURSES LIST
         $("#viewTeacherCourses").click(function () {
-            var teacherCourses = getTeacherCoursesByUserName();
+            var teacherCourses = getTeacherCourses();
             viewTeacherCourses(teacherCourses);
             $(".masterCourse").hover(function () {
                 $(this).css("background", "rgb(2, 45, 2)");
@@ -48,38 +48,45 @@ $(document).ready(function () {
             });
             $(".masterCourse").click(function () {
                 var courseId = $(this).attr('value');
-                var teacherCourse = getTeacherCourse(courseId);
+                var teacherCourse = getTeacherCourse(courseId, teacherCourses);
+
                 viewTeacherCourse(teacherCourse);
-                $("#addTestButton").click(function (){
-                    addNewExam();
+                $("#addTestButton").click(function () {
+                    addNewExam(courseId);
                 })
             })
         })
 
-        function addNewExam(){
+        function addNewExam(courseId) {
             $("article").html("<form id=\"newExamForm\">\n" +
                 "        <div>exam time(per minute):<br><input id='time' type=\"number\" max=\"180\" min=\"1\" placeholder=\"time\"></div>\n" +
+                "        <div>start date:<br><input id='start' type=\"datetime-local\"></div>\n" +
                 "        <div>title:<br><input id=\"title\" type=\"text\" placeholder=\"title\"></div>\n" +
                 "        <div>description:<br><textarea id=\"description\" placeholder=\"description\"></textarea></div>\n" +
                 "        <input type=\"submit\" value=\"save\">\n" +
                 "    </form>")
-            $("#newExamForm").submit(function (event){
+            $("#newExamForm").submit(function (event) {
                 event.preventDefault();
                 var exam = {
                     time: 1,
                     title: "",
-                    description: ""
+                    description: "",
+                    startDateAndTime: null,
+                    courseId: 0
                 }
-                exam.time = $("#time");
-                exam.title = $("#title");
-                exam.description = $("#description");
+                exam.time = $("#time").val();
+                exam.title = $("#title").val();
+                exam.description = $("#description").val();
+                exam.startDateAndTime = $("#start").val();
+                exam.courseId = courseId;
+                console.log(exam);
                 $.ajax({
-                    url: "",
+                    url: "/api/teacher/exam/create",
                     method: "POST",
                     contentType: "application/json",
-                    dataType: "json",
                     data: JSON.stringify(exam),
                     success: function (response) {
+                        console.log("gooooooooz")
                         console.log(response);
                         alert("exam saved successfully");
                     },
@@ -91,7 +98,7 @@ $(document).ready(function () {
         }
 
         function viewTeacherCourse(course) {
-            var exams = course.exams;
+            var exam = course.exam;
             var viewTeacherCourseCode = "<section>\n" +
                 "                    <button id=\"addTestButton\">\n" +
                 "                        <svg xmlns=\"http://www.w3.org/2000/svg\" class=\"bi bi-file-earmark-plus\" viewBox=\"0 0 16 16\">\n" +
@@ -101,32 +108,23 @@ $(document).ready(function () {
                 "                                d=\"M14 4.5V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h5.5L14 4.5zm-3 0A1.5 1.5 0 0 1 9.5 3V1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V4.5h-2z\"/>\n" +
                 "                        </svg>\n" +
                 "                    </button>";
-            for (var i = 0; i < exams.length; i++) {
-                viewTeacherCourseCode = viewTeacherCourseCode.concat("<button class=\"test\" name=\"testId\" value=\"" + exams[i].id +"\">\n" +
-                    "                        <p><b>" + exams[i].title +"</b></p>\n" +
-                    "                        <p>" + exams[i].time + "</p>\n" +
+            for (var i = 0; i < exam.length; i++) {
+                viewTeacherCourseCode = viewTeacherCourseCode.concat("<button class=\"test\" name=\"testId\" value=\"" + exam[i].id + "\">\n" +
+                    "                        <p><b>" + exam[i].title + "</b></p>\n" +
+                    "                        <p>" + exam[i].time + " minutes" + "</p>\n" +
                     "                    </button>");
             }
             viewTeacherCourseCode = viewTeacherCourseCode.concat("</section>");
             $("article").html(viewTeacherCourseCode);
         }
 
-        function getTeacherCourse(courseId) {
+        function getTeacherCourse(courseId, courseList) {
             var teacherCourse;
-            $.ajax({
-                url: "" + courseId,
-                method: "GET",
-                contentType: "application/json",
-                async: false,
-                dataType: "json",
-                success: function (response) {
-                    console.log(response);
-                    teacherCourse = response;
-                },
-                error: function (erorMessage) {
-                    console.log(erorMessage);
+            for (let i = 0; i < courseList.length; i++) {
+                if (courseId == courseList[i].id) {
+                    teacherCourse = courseList[i];
                 }
-            })
+            }
             return teacherCourse;
         }
 
@@ -142,7 +140,7 @@ $(document).ready(function () {
             $("article").html(teacherCoursesCode);
         }
 
-        function getTeacherCoursesByUserName() {
+        function getTeacherCourses() {
             var teacherCourses = [];
             $.ajax({
                 url: "/api/teacher/course/find",

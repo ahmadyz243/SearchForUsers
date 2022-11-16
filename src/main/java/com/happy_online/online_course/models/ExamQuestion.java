@@ -6,10 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 
 @Entity
 @Getter
@@ -24,7 +21,6 @@ public class ExamQuestion extends BaseDomain<Long> {
 
     @Column(nullable = false)
     private Double score;
-
-    @Column(nullable = false, name = "questionNumber")
-    private Integer number;
+    @ManyToOne
+    private Exam exam;
 }

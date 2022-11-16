@@ -7,20 +7,15 @@ import java.time.LocalDateTime;
 @Getter
 public class ExamCreateRequest {
 
-    private LocalDateTime time;
+    private Integer time;
     private LocalDateTime startDateAndTime;
     private String description;
     private String title;
     private Long courseId;
 
-    public void setTime(LocalDateTime time) {
+    public void setTime(Integer time) {
         this.time = time;
     }
-
-//    public void setTime(LocalDateTime time) {
-//        SimpleDateFormat timeFormatter = new SimpleDateFormat("hh:mm");
-//        this.time = LocalDateTime.parse(timeFormatter.format(time));
-//    }
 
     public void setStartDateAndTime(LocalDateTime startDateAndTime) {
         this.startDateAndTime = startDateAndTime;

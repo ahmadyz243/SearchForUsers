@@ -9,8 +9,10 @@ import com.happy_online.online_course.payload.response.*;
 import com.happy_online.online_course.service.CourseService;
 import com.happy_online.online_course.service.ExamService;
 import com.happy_online.online_course.service.TeacherService;
+import org.apache.coyote.Response;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -41,7 +43,7 @@ public class TeacherController {
         return new ResponseEntity<>(courses, HttpStatus.ACCEPTED);
     }
 
-    @PostMapping("/exam/create")
+    @PostMapping(value = "/exam/create", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> addNewExam(@RequestBody ExamCreateRequest examCreateRequest) {
         examService.saveExam(examCreateRequest);
         return ResponseEntity.ok("exam added");
@@ -79,12 +81,29 @@ public class TeacherController {
         List<Course> courses = teacher.getCourseList();
         List<TeacherCourseResponse> responseTeachers = new ArrayList<>();
         courses.forEach(course -> {
+            List<ExamResponseForUpdate> examResponse = examService.findByCourse(course);
             TeacherCourseResponse courseInfoResponse = new TeacherCourseResponse();
             BeanUtils.copyProperties(course, courseInfoResponse);
             courseInfoResponse.setId(course.getId());
+            courseInfoResponse.setExam(examResponse);
             courseInfoResponse.setEnabled(course.getActive());
             responseTeachers.add(courseInfoResponse);
         });
         return new ResponseEntity<>(responseTeachers, HttpStatus.ACCEPTED);
+    }
+
+    //add question to exam
+    @PutMapping(value = "course/exam/add-question", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> addQuestion() {
+
+        return ResponseEntity.ok("question added");
+    }
+
+    //at the first we have to find questions in bank
+    @GetMapping("/course/exam/find-questions/{courseId}")
+    public ResponseEntity<List<QuestionResponse>> getCreatedQuestions(@PathVariable Long courseId) {
+        String teacherUsername = SecurityContextHolder.getContext().getAuthentication().getName();
+        Teacher teacher = teacherService.findByUsername(teacherUsername);
+        return null;
     }
 }

@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class ExamServiceImpl extends BaseServiceImpl<Exam, Long, ExamRepository> implements ExamService {
@@ -46,9 +48,21 @@ public class ExamServiceImpl extends BaseServiceImpl<Exam, Long, ExamRepository>
         return repository.save(exam);
     }
 
+    @Override
+    public List<ExamResponseForUpdate> findByCourse(Course course) {
+        List<Exam> exam = repository.findByCourse(course);
+        List<ExamResponseForUpdate> response = new ArrayList<>();
+        exam.forEach(examFor -> {
+            ExamResponseForUpdate examResponseForUpdate = new ExamResponseForUpdate();
+            response.add(mapExamToResponse(examFor));
+        });
+        return response;
+    }
+
     private ExamResponseForUpdate mapExamToResponse(Exam exam) {
         ExamResponseForUpdate response = new ExamResponseForUpdate();
         BeanUtils.copyProperties(exam, response);
+        response.setId(exam.getId());
         return response;
     }
 

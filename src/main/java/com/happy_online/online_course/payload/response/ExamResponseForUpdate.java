@@ -9,7 +9,8 @@ import java.time.LocalDateTime;
 @Setter
 
 public class ExamResponseForUpdate {
-    private LocalDateTime time;
+    private Long id;
+    private Integer time;
     private LocalDateTime startDateAndTime;
     private String description;
     private String title;

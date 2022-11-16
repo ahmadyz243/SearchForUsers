@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.sql.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -14,5 +15,6 @@ public class TeacherCourseResponse {
     private String description;
     private String title;
     private boolean enabled;
+    private List<ExamResponseForUpdate> exam;
 }
 

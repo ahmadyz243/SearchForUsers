@@ -5,12 +5,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -31,6 +30,9 @@ public class Exam extends BaseDomain<Long> {
     @Column(nullable = false, name = "examTime")
     private Integer time;
 
+    @OneToMany(mappedBy = "exam")
+    private List<ExamQuestion> examQuestionList = new ArrayList<>();
+
     public void setCourse(Course course) {
         this.course = course;
     }
@@ -47,5 +49,11 @@ public class Exam extends BaseDomain<Long> {
         this.startDateAndTime = startDateAndTime;
     }
 
+    public void setTime(Integer time) {
+        this.time = time;
+    }
 
+    public void setExamQuestionList(List<ExamQuestion> examQuestionList) {
+        this.examQuestionList = examQuestionList;
+    }
 }

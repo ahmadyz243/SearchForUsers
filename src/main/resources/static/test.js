@@ -89,9 +89,7 @@ $(document).ready(function () {
                 })
             })
         }
-        function viewNewExamForm(){
 
-        }
         function viewTeacherCourse(course) {
             var exams = course.exams;
             var viewTeacherCourseCode = "<section>\n" +

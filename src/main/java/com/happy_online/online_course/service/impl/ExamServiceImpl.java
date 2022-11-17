@@ -2,32 +2,36 @@ package com.happy_online.online_course.service.impl;
 
 import com.happy_online.online_course.models.Course;
 import com.happy_online.online_course.models.Exam;
+import com.happy_online.online_course.models.ExamQuestion;
+import com.happy_online.online_course.models.Question;
 import com.happy_online.online_course.payload.request.ExamCreateRequest;
+import com.happy_online.online_course.payload.request.MultipleChoiceQuestionDTO;
 import com.happy_online.online_course.payload.response.ExamResponseForUpdate;
 import com.happy_online.online_course.repository.ExamRepository;
 import com.happy_online.online_course.service.CourseService;
 import com.happy_online.online_course.service.ExamService;
+import com.happy_online.online_course.service.QuestionService;
 import com.happy_online.online_course.service.base.impl.BaseServiceImpl;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class ExamServiceImpl extends BaseServiceImpl<Exam, Long, ExamRepository> implements ExamService {
-    public ExamServiceImpl(ExamRepository repository, CourseService courseService, ExamRepository examRepository) {
+    public ExamServiceImpl(ExamRepository repository, CourseService courseService, ExamRepository examRepository, QuestionService questionService) {
         super(repository);
         this.courseService = courseService;
         this.examRepository = examRepository;
+        this.questionService = questionService;
     }
 
     final CourseService courseService;
     final ExamRepository examRepository;
-
+    final QuestionService questionService;
 
     @Override
     public Exam saveExam(ExamCreateRequest examCreateRequest) {
@@ -58,6 +62,35 @@ public class ExamServiceImpl extends BaseServiceImpl<Exam, Long, ExamRepository>
         });
         return response;
     }
+
+    @Override
+    @Transactional
+    public void addQuestion(Long examId, Question question) {
+        Exam exam = findById(examId);
+        ExamQuestion examQuestion = new ExamQuestion();
+        examQuestion.setQuestion(question);
+        examQuestion.setExam(exam);
+        exam.setExamQuestionList(examQuestion);
+    }
+
+    @Override
+    @Transactional
+    public void addQuestion(Long examId, Long questionId) {
+        Exam exam = findById(examId);
+        ExamQuestion examQuestion = new ExamQuestion();
+        Question question = questionService.findById(questionId);
+        examQuestion.setQuestion(question);
+        examQuestion.setExam(exam);
+        exam.setExamQuestionList(examQuestion);
+    }
+
+    @Override
+    public void addMultipleChoiceQuestion(MultipleChoiceQuestionDTO multipleChoiceQuestion) {
+        Question question = questionService.save(multipleChoiceQuestion);
+        addQuestion(multipleChoiceQuestion.getExamId(), question);
+
+    }
+
 
     private ExamResponseForUpdate mapExamToResponse(Exam exam) {
         ExamResponseForUpdate response = new ExamResponseForUpdate();

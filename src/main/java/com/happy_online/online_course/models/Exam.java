@@ -30,7 +30,7 @@ public class Exam extends BaseDomain<Long> {
     @Column(nullable = false, name = "examTime")
     private Integer time;
 
-    @OneToMany(mappedBy = "exam")
+    @OneToMany(mappedBy = "exam", cascade = CascadeType.ALL)
     private List<ExamQuestion> examQuestionList = new ArrayList<>();
 
     public void setCourse(Course course) {
@@ -53,7 +53,8 @@ public class Exam extends BaseDomain<Long> {
         this.time = time;
     }
 
-    public void setExamQuestionList(List<ExamQuestion> examQuestionList) {
-        this.examQuestionList = examQuestionList;
+    public void setExamQuestionList(ExamQuestion examQuestionList) {
+        this.examQuestionList.add(examQuestionList);
     }
+
 }

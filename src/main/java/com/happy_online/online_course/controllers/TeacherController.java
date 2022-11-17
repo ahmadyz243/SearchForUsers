@@ -1,15 +1,21 @@
 package com.happy_online.online_course.controllers;
 
+import com.happy_online.online_course.mapper.QuestionMapper;
 import com.happy_online.online_course.models.Course;
+import com.happy_online.online_course.models.DetailedQuestion;
 import com.happy_online.online_course.models.Exam;
 import com.happy_online.online_course.models.Teacher;
-import com.happy_online.online_course.payload.request.ExamCreateRequest;
-import com.happy_online.online_course.payload.request.ExamUpdateRequest;
-import com.happy_online.online_course.payload.response.*;
+import com.happy_online.online_course.payload.request.*;
+import com.happy_online.online_course.payload.response.CourseInfoResponseTeacher;
+import com.happy_online.online_course.payload.response.ExamResponseForUpdate;
+import com.happy_online.online_course.payload.response.QuestionResponse;
+import com.happy_online.online_course.payload.response.TeacherCourseResponse;
 import com.happy_online.online_course.service.CourseService;
 import com.happy_online.online_course.service.ExamService;
+import com.happy_online.online_course.service.QuestionService;
 import com.happy_online.online_course.service.TeacherService;
-import org.apache.coyote.Response;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -28,11 +34,15 @@ public class TeacherController {
     final CourseService courseService;
     final TeacherService teacherService;
     final ExamService examService;
+    final QuestionService questionService;
+    final QuestionMapper questionMapper;
 
-    public TeacherController(CourseService courseService, TeacherService teacherService, ExamService examService) {
+    public TeacherController(CourseService courseService, TeacherService teacherService, ExamService examService, QuestionService questionService, QuestionMapper questionMapper) {
         this.courseService = courseService;
         this.teacherService = teacherService;
         this.examService = examService;
+        this.questionService = questionService;
+        this.questionMapper = questionMapper;
     }
 
     @GetMapping("/find/courses")
@@ -92,18 +102,49 @@ public class TeacherController {
         return new ResponseEntity<>(responseTeachers, HttpStatus.ACCEPTED);
     }
 
-    //add question to exam
-    @PutMapping(value = "course/exam/add-question", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> addQuestion() {
+    //add question to question bank
+    @PutMapping(value = "/course/exam/question-bank/add-question", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ExamQuestionInfo> addQuestionToBank(@RequestBody QuestionCreateRequest createRequest) {
 
-        return ResponseEntity.ok("question added");
+
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
-    //at the first we have to find questions in bank
+    //at first , we have to find questions in questions bank
     @GetMapping("/course/exam/find-questions/{courseId}")
     public ResponseEntity<List<QuestionResponse>> getCreatedQuestions(@PathVariable Long courseId) {
         String teacherUsername = SecurityContextHolder.getContext().getAuthentication().getName();
-        Teacher teacher = teacherService.findByUsername(teacherUsername);
-        return null;
+        List<QuestionResponse> questions = questionService.getCompleteQuestions(teacherUsername, courseId);
+        return new ResponseEntity<>(questions, HttpStatus.ACCEPTED);
+    }
+
+
+    //add question to exam from question bank
+    @PutMapping(value = "/course/exam/add-question", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> addQuestion(@RequestBody ExamQuestionInfo questionInfo) {
+        examService.addQuestion(questionInfo.getExamId(), questionInfo.getQuestionId());
+        return ResponseEntity.ok("question added");
+    }
+
+    // add multiple choice question
+    @PostMapping("/course/exam/add-multiple")
+    public ResponseEntity<?> addMultipleChoiceQuestion(@RequestBody MultipleChoiceQuestionDTO multipleChoiceQuestion) {
+        examService.addMultipleChoiceQuestion(multipleChoiceQuestion);
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+    }
+
+    // add detailed question
+    @PostMapping("/course/exam/add-detailed-exam")
+    public ResponseEntity<?> addDetailedQuestion(@RequestBody DetailedQuestionDTO detailedQuestion) {
+        questionService.save(detailedQuestion);
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+    }
+
+    @Getter
+    @Setter
+    private static class ExamQuestionInfo {
+        private Long questionId;
+        private Long examId;
     }
 }
+

@@ -19,7 +19,6 @@ public class ExamQuestion extends BaseDomain<Long> {
     @OneToOne
     private Question question;
 
-    @Column(nullable = false)
     private Double score;
     @ManyToOne
     private Exam exam;

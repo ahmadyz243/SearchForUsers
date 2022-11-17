@@ -6,10 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
+import javax.validation.constraints.Size;
 import java.util.List;
 
 @Entity
@@ -17,14 +15,16 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Question extends BaseDomain<Long> {
-    @OneToMany(mappedBy = "question")
-    private List<QuestionItem> questionItemList;
-
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+public abstract class Question extends BaseDomain<Long> {
     @ManyToOne
     private Course course;
     @ManyToOne
     private Teacher teacher;
+
+    @Size(min = 2, max = 40)
+    @Column(nullable = false)
+    private String title;
 
     @Column(nullable = false)
     private String question;

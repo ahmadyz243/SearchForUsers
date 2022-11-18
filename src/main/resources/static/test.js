@@ -40,6 +40,7 @@ $(document).ready(function () {
         //GET TEACHER COURSES LIST
         $("#viewTeacherCourses").click(function () {
             var teacherCourses = getTeacherCourses();
+            console.log(teacherCourses);
             viewTeacherCourses(teacherCourses);
             $(".masterCourse").hover(function () {
                 $(this).css("background", "rgb(2, 45, 2)");
@@ -49,14 +50,20 @@ $(document).ready(function () {
             $(".masterCourse").click(function () {
                 var courseId = $(this).attr('value');
                 var teacherCourse = getTeacherCourse(courseId, teacherCourses);
-
                 viewTeacherCourse(teacherCourse);
                 $("#addTestButton").click(function () {
                     addNewExam(courseId);
                 })
+                $(".test").click(function (){
+                    var examId = $(this).attr('value');
+                    var exam = getExamById(examId);
+                    viewTeacherExam(exam);
+                })
             })
         })
+        function viewTeacherExam(exam){
 
+        }
         function addNewExam(courseId) {
             $("article").html("<form id=\"newExamForm\">\n" +
                 "        <div>exam time(per minute):<br><input id='time' type=\"number\" max=\"180\" min=\"1\" placeholder=\"time\"></div>\n" +
@@ -79,14 +86,12 @@ $(document).ready(function () {
                 exam.description = $("#description").val();
                 exam.startDateAndTime = $("#start").val();
                 exam.courseId = courseId;
-                console.log(exam);
                 $.ajax({
                     url: "/api/teacher/exam/create",
                     method: "POST",
                     contentType: "application/json",
                     data: JSON.stringify(exam),
                     success: function (response) {
-                        console.log("gooooooooz")
                         console.log(response);
                         alert("exam saved successfully");
                     },

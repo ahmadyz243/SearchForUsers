@@ -1,5 +1,6 @@
 package com.happy_online.online_course.service.impl;
 
+import com.happy_online.online_course.mapper.ExamMapper;
 import com.happy_online.online_course.models.Course;
 import com.happy_online.online_course.models.Exam;
 import com.happy_online.online_course.models.ExamQuestion;
@@ -7,6 +8,7 @@ import com.happy_online.online_course.models.Question;
 import com.happy_online.online_course.payload.request.ExamCreateRequest;
 import com.happy_online.online_course.payload.request.MultipleChoiceQuestionDTO;
 import com.happy_online.online_course.payload.response.ExamResponseForUpdate;
+import com.happy_online.online_course.payload.response.ExamResponseForView;
 import com.happy_online.online_course.repository.ExamRepository;
 import com.happy_online.online_course.service.CourseService;
 import com.happy_online.online_course.service.ExamService;
@@ -22,16 +24,18 @@ import java.util.List;
 
 @Service
 public class ExamServiceImpl extends BaseServiceImpl<Exam, Long, ExamRepository> implements ExamService {
-    public ExamServiceImpl(ExamRepository repository, CourseService courseService, ExamRepository examRepository, QuestionService questionService) {
+    public ExamServiceImpl(ExamRepository repository, CourseService courseService, ExamRepository examRepository, QuestionService questionService, ExamMapper examMapper) {
         super(repository);
         this.courseService = courseService;
         this.examRepository = examRepository;
         this.questionService = questionService;
+        this.examMapper = examMapper;
     }
 
     final CourseService courseService;
     final ExamRepository examRepository;
     final QuestionService questionService;
+    final ExamMapper examMapper;
 
     @Override
     public Exam saveExam(ExamCreateRequest examCreateRequest) {
@@ -99,13 +103,16 @@ public class ExamServiceImpl extends BaseServiceImpl<Exam, Long, ExamRepository>
         return response;
     }
 
+    @Override
+    public ExamResponseForView mapExamToExamResponseForView(Exam exam) {
+        ExamResponseForView response = examMapper.examsToExamResponseForViewList(exam);
+        return response;
+    }
+
     private Exam mapCreateReqToExam(ExamCreateRequest examCreateRequest) {
         Exam exam = new Exam();
         BeanUtils.copyProperties(examCreateRequest, exam);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
-//        SimpleDateFormat timeFormatter = new SimpleDateFormat("hh:mm");
-//        String strDate = formatter.format(examCreateRequest.getTime());
-//        exam.setTime(LocalDateTime.parse(strDate,formatter));
         return exam;
     }
 }

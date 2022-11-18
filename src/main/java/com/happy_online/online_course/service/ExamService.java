@@ -6,6 +6,7 @@ import com.happy_online.online_course.models.Question;
 import com.happy_online.online_course.payload.request.ExamCreateRequest;
 import com.happy_online.online_course.payload.request.MultipleChoiceQuestionDTO;
 import com.happy_online.online_course.payload.response.ExamResponseForUpdate;
+import com.happy_online.online_course.payload.response.ExamResponseForView;
 import com.happy_online.online_course.service.base.BaseService;
 
 import java.util.List;
@@ -25,4 +26,6 @@ public interface ExamService extends BaseService<Exam, Long> {
 
 
     void addMultipleChoiceQuestion(MultipleChoiceQuestionDTO multipleChoiceQuestion);
+
+    ExamResponseForView mapExamToExamResponseForView(Exam exams);
 }

@@ -54,16 +54,96 @@ $(document).ready(function () {
                 $("#addTestButton").click(function () {
                     addNewExam(courseId);
                 })
-                $(".test").click(function (){
+                $(".test").click(function () {
                     var examId = $(this).attr('value');
                     var exam = getExamById(examId);
                     viewTeacherExam(exam);
                 })
             })
         })
-        function viewTeacherExam(exam){
 
+        function getExamById(examId) {
+            var exam;
+            $.ajax({
+                url: "/api/teacher/course/exam/get/" + examId,
+                method: "GET",
+                async: false,
+                contentType: "application/json",
+                success: function (response) {
+                    exam = response;
+                },
+                error: function (erorMessage) {
+                    console.log(erorMessage);
+                }
+            })
+            return exam;
         }
+
+        function viewTeacherExam(exam) {
+            var viewTeacherExamCode = " <div id=\"examSection\">\n" +
+                "        <form id=\"examForm\">\n" +
+                "            <input id=\"examTitle\" class=\"examDetails\" type=\"text\" placeholder=\"" + exam.title + "\" disabled>\n" +
+                "            <input disabled id=\"examStartDate\" class=\"examDetails\" type=\"text\" placeholder=\"" + exam.startDateAndTime + "\" onclick=\"(this.type='datetime-local')\">\n" +
+                "            <input id=\"examTime\" class=\"examDetails\" disabled placeholder=\"" + exam.time + "\">\n" +
+                "            <textarea id=\"examDescription\" class=\"examDetails\" disabled placeholder=\"" + exam.description + "\"></textarea>\n" +
+                "            <button id=\"updateExam\" value=\"" + exam.id + "\">update</button>\n" +
+                "        </form>" +
+                "  <button id=\"editExam\">edit</button>\n" +
+                "        <button id=\"deleteExam\" value=\"" + exam.id + "\">delete exam</button>\n" +
+                "        <div id=\"multipleQuestions\" class=\"questions\">\n" +
+                "            <h2>multiple option questions</h2>";
+            var counterM = 1;
+            var counterD = 0;
+            for (let i = 0; i < exam.examQuestionList.length; i++) {
+                if (exam.examQuestionList[i].question.questionItemList != null) {
+                    counterD++;
+                }
+            }
+            var DetailedQuestions = [];
+            var itemsCode = "";
+            for (let i = 0; i < exam.examQuestionList.length; i++) {
+                if (exam.examQuestionList[i].question.questionItemList != null) {
+                    itemsCode = "";
+                    for (let j = 0; j < exam.examQuestionList[i].question.questionItemList.length; j++) {
+                        var count = j + 97;
+                        itemsCode = itemsCode.concat(
+                            " <div className=\"questionItem\">\n" +
+                            "<p>" + String.fromCharCode(count) + ") " + exam.examQuestionList[i].question.questionItemList[j].answer + " </p>\n" +
+                            "</div>\n");
+                    }
+                    viewTeacherExamCode = viewTeacherExamCode.concat("  <div className=\"multipleQuestion question\">\n" +
+                        "                        <div className=\"questionText\">\n" +
+                        "                            <p><b>" + counterM + " : " + exam.examQuestionList[i].question.question +
+                        "                     (score: " + exam.examQuestionList[i].score + ")</b></p></div>\n" +
+                        itemsCode +
+                        "                <button class=\"editQuestion\">edit question</button>\n" +
+                        "                <hr>");
+                    counterM++;
+                } else {
+                    DetailedQuestions.push(exam.examQuestionList[i]);
+                }
+            }
+            viewTeacherExamCode = viewTeacherExamCode.concat("  <button id=\"addNewMultipleQuestion\">add a new multiple option question</button>\n" +
+                "            <div id=\"detaledQuestions\" class=\"questions\">\n" +
+                "                <h2>detailed questions</h2>");
+            for (let x = 0; x < DetailedQuestions.length; x++) {
+                viewTeacherExamCode = viewTeacherExamCode.concat("  <div class=\"detailedQuestion question\">\n" +
+                    "                    <div class=\"questionText\">\n" +
+                    "                        <p><b>" + counterD + " : " + DetailedQuestions[x].question.answer + "(score:" + DetailedQuestions[x].score + ")</b></p>\n" +
+                    "                    </div>\n" +
+                    "                </div>\n" +
+                    "                <button class=\"editQuestion\">edit question</button>\n" +
+                    "                <hr>")
+                counterD++;
+            }
+            viewTeacherExamCode = viewTeacherExamCode.concat("<button id=\"addNewDetailedQuestion\">add a new detailed question</button>\n" +
+                "   </div>\n" +
+                "\n" +
+                "   </div>\n" +
+                "    </div>")
+            $("article").html(viewTeacherExamCode);
+        }
+
         function addNewExam(courseId) {
             $("article").html("<form id=\"newExamForm\">\n" +
                 "        <div>exam time(per minute):<br><input id='time' type=\"number\" max=\"180\" min=\"1\" placeholder=\"time\"></div>\n" +

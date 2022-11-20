@@ -1,8 +1,8 @@
-body {
+body{
     background-color: rgb(216, 75, 9);
 }
 
-nav {
+nav{
     display: flex;
     background-color: rgb(222, 215, 6);
     color: black;
@@ -11,18 +11,13 @@ nav {
     align-items: center;
 }
 
-hr {
-    width: 90%;
-    color: black;
-}
-
-article {
+article{
     margin-top: 10px;
     display: inline-block;
     width: 67%;
 }
 
-section {
+section{
     display: flex;
     word-break: break-all;
 }
@@ -42,7 +37,7 @@ aside {
     background-color: lightgray;
 }
 
-button {
+button{
     width: 60%;
     height: 45px;
     margin-top: 35px;
@@ -54,7 +49,11 @@ textarea {
     resize: none;
 }
 
-.masterCourse {
+h2{
+    text-align: center;
+}
+
+.masterCourse{
     display: flex;
     justify-content: space-around;
     padding-top: 8px;
@@ -65,7 +64,7 @@ textarea {
     font-size: 170%;
 }
 
-.test {
+.test{
     width: 150px;
     height: 200px;
     margin-right: 7px;
@@ -73,7 +72,7 @@ textarea {
     color: black;
 }
 
-.examDetails {
+.examDetails{
     background-color: rgb(240, 221, 7);
     color: black;
     font-size: large;
@@ -81,7 +80,7 @@ textarea {
     margin-top: 15px;
 }
 
-.questions {
+.questions{
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -89,26 +88,34 @@ textarea {
     margin-top: 35px;
 }
 
-.question {
+.question{
     margin-bottom: 0px;
 }
 
-.questionText {
+.questionText{
     line-height: 28px;
 }
 
-.questionItem {
+.questionItem{
     text-indent: 3%;
 }
 
-.editQuestion {
+.editQuestion{
     width: 25%;
     height: 25px;
     margin-bottom: 20px;
     margin-top: 5px;
 }
 
-#addTestButton {
+.greenText{
+    color: rgb(4, 253, 4);
+}
+
+.largerText{
+    font-size: larger;
+}
+
+#addTestButton{
     width: 150px;
     height: 200px;
     margin-right: 7px;
@@ -118,7 +125,7 @@ textarea {
     display: inline-block;
 }
 
-#newExamForm {
+#newExamForm{
     display: flex;
     flex-direction: column;
     justify-content: space-around;
@@ -129,16 +136,16 @@ textarea {
     font-size: large;
 }
 
-#newExamForm input {
+#newExamForm input{
     height: 33px;
 }
 
-#newExamForm textarea {
+#newExamForm textarea{
     height: 75px;
     width: 98%;
 }
 
-#examSection {
+#examSection{
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -150,33 +157,33 @@ textarea {
     overflow: auto;
 }
 
-#examForm {
+#examForm{
     display: flex;
     flex-direction: column;
     align-items: center;
     width: 90%;
 }
 
-#examTitle {
+#examTitle{
     font-size: large;
 }
 
-#examDescription {
+#examDescription{
     height: 120px;
     width: 85%;
 }
 
-#examStartDate {
+#examStartDate{
     width: 40%;
 }
 
-#editExam {
+#editExam{
     width: 20%;
     height: 30px;
     margin-top: 5px;
 }
 
-#updateExam {
+#updateExam{
     margin-top: 15px;
     width: 20%;
     height: 30px;
@@ -184,17 +191,66 @@ textarea {
     color: black;
 }
 
-#deleteExam {
+#deleteExam{
     background-color: red;
     width: 20%;
     height: 30px;
     margin-top: 5px;
 }
 
-#addNewDetailedQuestion {
+#addNewDetailedQuestion{
     margin-bottom: 60px;
 }
 
+#newQuestionForm{
+    display: flex;
+    flex-direction: column;
+    width: 95%;
+    margin-left: 25px;
+    margin-right: 25px;
+    align-items: center;
+    font-size: large;
+}
+
+#newQuestionForm div{
+    width: 98%;
+}
+
+#questionText{
+    margin-bottom: 10px;
+    height: 90px;
+    width: 98%;
+}
+
+#newItemButton{
+    height: 30px;
+    width: 18%;
+    background-color: rgb(2, 143, 47);
+    margin-top: 1px;
+}
+
+#addNewItem{
+    height: 30px;
+    width: 78%;
+    margin-bottom: 15px;
+}
+
+#saveMultipleQuestion{
+    width: 20%;
+    height: 30px;
+    background-color: green;
+}
+
+#saveDetailQuestion{
+    width: 20%;
+    height: 30px;
+    background-color: green;
+    margin-top: 30px;
+}
+
+#questionDefaultGrade{
+    width: 10%;
+}
 
 ::placeholder {
     text-align: center;

@@ -58,10 +58,96 @@ $(document).ready(function () {
                     var examId = $(this).attr('value');
                     var exam = getExamById(examId);
                     viewTeacherExam(exam);
+                    $("#addNewMultipleQuestion").click(function (){
+                        addNewMultipleOptionQuestion(exam);
+                    })
+                    $("#addNewDetailedQuestion").click(function (){
+                        addNewDetailQuestion(exam);
+                    })
                 })
             })
         })
 
+    function viewAddNewDetailQuestionpage(){
+        $("article").html("<h2>add new detail question</h2>\n" +
+            "    <form id=\"newQuestionForm\">\n" +
+            "        <div><b>question text:</b><textarea id=\"questionText\"></textarea></div>\n" +
+            "        <div>\n" +
+            "            <b>enter a default grade for question:  </b><input id=\"questionDefaultGrade\" type=\"number\" step=\"0.01\" placeholder=\"grade\">\n" +
+            "        </div>\n" +
+            "        <input id=\"saveDetailQuestion\" type=\"submit\" value=\"save question\">\n" +
+            "    </form>");
+    }
+        function addNewMultipleOptionQuestion(exam){
+            var multipleOptionQuestion = {
+                examId: exam.id,
+                question: "",
+                defaultGrade: 0,
+                itemsList: [],
+            }
+            viewAddNewMultipleOptionQuestionpage(multipleOptionQuestion);
+            $("#newItemButton").click(function (){
+                var questionItem = {
+                    text: $(this).val(),
+                    isRightAnswer: false
+                }
+                multipleOptionQuestion.question = $("#questionText").val();
+                multipleOptionQuestion.defaultGrade = $("#questionDefaultGrade").val();
+                addItemToQuestion(multipleOptionQuestion, questionItem);
+            })
+            $("#saveMultipleQuestion").click(function (){
+                multipleOptionQuestion.question = $("#questionText").val();
+                multipleOptionQuestion.defaultGrade = $("#questionDefaultGrade").val();
+                saveMultipleOptionQuestion(multipleOptionQuestion);
+                exam.examQuestionList.push(multipleOptionQuestion);
+                alert("save successfully...");
+                viewTeacherExam(exam);
+            })
+        }
+        function saveMultipleOptionQuestion(multipleOptionQuestion){
+
+        }
+        function addItemToQuestion(multipleOptionQuestion, item){
+            multipleOptionQuestion.itemsList.push(item);
+            viewAddNewMultipleOptionQuestionpage(multipleOptionQuestion);
+        }
+        function viewAddNewMultipleOptionQuestionpage(multipleOptionQuestion){
+            var itemsCode = "";
+            for (var i = 0; i < multipleOptionQuestion.itemsList.length; i++) {
+                var count = i + 97;
+                itemsCode = itemsCode.concat("<p><input type=\"radio\" name=\"newQuestionItem\" value=\"\" required> " + String.fromCharCode(count) + ") " + multipleOptionQuestion.itemsList.text + "</p>");
+            }
+            $("article").html("<h2>add new multiple option question</h2>\n" +
+                "    <form id=\"newQuestionForm\">\n" +
+                "        <div><b>question text:</b><textarea id=\"questionText\"></textarea></div>\n" +
+                "        <div>\n" +
+                "            <b>enter a default garde for question:  </b><input id=\"questionDefaultGrade\" type=\"number\" step=\"0.01\" placeholder=\"grade\">\n" +
+                "        </div>\n" +
+                "        <div>\n" +
+                itemsCode +
+                "            <p class=\"greenText largerText\">select the right answer</p>\n" +
+                "        </div>\n" +
+                "        <div>\n" +
+                "            <input id=\"addNewItem\" type=\"text\" placeholder=\"enter new item's text here\">\n" +
+                "            <button type=\"button\" id=\"newItemButton\">add an item</button>\n" +
+                "        </div>\n" +
+                "        <input id=\"saveMultipleQuestion\" type=\"submit\" value=\"save question\">\n" +
+                "    </form>");
+            $("#questionText").html(multipleOptionQuestion.question);
+            $("#questionDefaultGrade").html(multipleOptionQuestion.defaultGrade);
+        }
+        function addNewDetailQuestion(exam){
+            viewAddNewDetailQuestionpage();
+            var detailQuestion = {
+                examId: exam.id,
+                question: $("#questionText").val(),
+                defaultGrade: $("#questionDefaultGrade").val()
+            }
+            saveDetailQuestion(detailQuestion);
+        }
+        function saveDetailQuestion(detailQuestion){
+
+        }
         function getExamById(examId) {
             var exam;
             $.ajax({
@@ -116,6 +202,7 @@ $(document).ready(function () {
                         "                            <p><b>" + counterM + " : " + exam.examQuestionList[i].question.question +
                         "                     (score: " + exam.examQuestionList[i].score + ")</b></p></div>\n" +
                         itemsCode +
+                        "</div>" +
                         "                <button class=\"editQuestion\">edit question</button>\n" +
                         "                <hr>");
                     counterM++;

@@ -22,4 +22,5 @@ public class ExamQuestion extends BaseDomain<Long> {
     private Double score;
     @ManyToOne
     private Exam exam;
+
 }

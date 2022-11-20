@@ -19,4 +19,7 @@ public class MultipleChoiceQuestionDTO {
     private String question;
 
     private Long examId;
+
+    private Double score;
+
 }

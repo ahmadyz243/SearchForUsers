@@ -20,7 +20,7 @@ public interface ExamService extends BaseService<Exam, Long> {
 
     List<ExamResponseForUpdate> findByCourse(Course course);
 
-    void addQuestion(Long examId, Question question);
+    void addQuestion(Long examId, Question question, Double score);
 
     void addQuestion(Long examId, Long questionId);
 

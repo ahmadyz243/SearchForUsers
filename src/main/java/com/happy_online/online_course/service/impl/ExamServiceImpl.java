@@ -69,11 +69,12 @@ public class ExamServiceImpl extends BaseServiceImpl<Exam, Long, ExamRepository>
 
     @Override
     @Transactional
-    public void addQuestion(Long examId, Question question) {
+    public void addQuestion(Long examId, Question question, Double score) {
         Exam exam = findById(examId);
         ExamQuestion examQuestion = new ExamQuestion();
         examQuestion.setQuestion(question);
         examQuestion.setExam(exam);
+        examQuestion.setScore(score);
         exam.setExamQuestionList(examQuestion);
     }
 
@@ -91,7 +92,7 @@ public class ExamServiceImpl extends BaseServiceImpl<Exam, Long, ExamRepository>
     @Override
     public void addMultipleChoiceQuestion(MultipleChoiceQuestionDTO multipleChoiceQuestion) {
         Question question = questionService.save(multipleChoiceQuestion);
-        addQuestion(multipleChoiceQuestion.getExamId(), question);
+        addQuestion(multipleChoiceQuestion.getExamId(), question, multipleChoiceQuestion.getScore());
 
     }
 

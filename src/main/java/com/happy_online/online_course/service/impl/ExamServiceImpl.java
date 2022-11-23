@@ -15,9 +15,12 @@ import com.happy_online.online_course.service.ExamService;
 import com.happy_online.online_course.service.QuestionService;
 import com.happy_online.online_course.service.base.impl.BaseServiceImpl;
 import org.springframework.beans.BeanUtils;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -106,8 +109,22 @@ public class ExamServiceImpl extends BaseServiceImpl<Exam, Long, ExamRepository>
 
     @Override
     public ExamResponseForView mapExamToExamResponseForView(Exam exam) {
-        ExamResponseForView response = examMapper.examsToExamResponseForViewList(exam);
-        return response;
+        return examMapper.examsToExamResponseForViewList(exam);
+    }
+
+    @Override
+    public ExamResponseForView findByIdForStart(Long exam_id, String studentUsername) {
+        Exam exam = findById(exam_id);
+        if (exam.getStartDateAndTime().isAfter(LocalDateTime.now()) || exam.getEndDate().isBefore(LocalDateTime.now())) {
+            // TODO: change the exception
+            throw new BadCredentialsException("exam is not start or time is up");
+        }
+        exam.getStudentsAnswers().forEach(studentsAnswers -> {
+            if (studentsAnswers.getStudent().getUsername().equals(studentUsername)) {
+                throw new BadCredentialsException("bro you cant join this exam again!");
+            }
+        });
+        return mapExamToExamResponseForView(exam);
     }
 
     private Exam mapCreateReqToExam(ExamCreateRequest examCreateRequest) {

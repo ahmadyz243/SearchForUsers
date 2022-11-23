@@ -2,6 +2,7 @@ package com.happy_online.online_course.service;
 
 import com.happy_online.online_course.models.Course;
 import com.happy_online.online_course.models.Teacher;
+import com.happy_online.online_course.payload.CourseInfoResponseForStudent;
 import com.happy_online.online_course.payload.request.CreateCourseRequest;
 import com.happy_online.online_course.payload.response.CourseInfoResponse;
 import com.happy_online.online_course.payload.response.CourseInfoResponseTeacher;
@@ -25,4 +26,6 @@ public interface CourseService extends BaseService<Course, Long> {
 
     List<Course> findByTeacher(Teacher teacher);
     List<CourseInfoResponseTeacher> mapCourseToResponse(Teacher teacher);
+
+    List<CourseInfoResponseForStudent> findStudentCourses(String studentUsername);
 }

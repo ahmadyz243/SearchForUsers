@@ -1,7 +1,9 @@
 package com.happy_online.online_course.service.impl;
 
+import com.happy_online.online_course.exception.NotFoundException;
 import com.happy_online.online_course.models.Student;
 import com.happy_online.online_course.models.User;
+import com.happy_online.online_course.payload.CourseInfoResponseForStudent;
 import com.happy_online.online_course.payload.request.SignupRequest;
 import com.happy_online.online_course.payload.response.StudentDto;
 import com.happy_online.online_course.repository.StudentRepository;
@@ -63,6 +65,11 @@ public class StudentServiceImpl extends BaseServiceImpl<Student, Long, StudentRe
             studentDtoList.add(studentDto);
         });
         return studentDtoList;
+    }
+
+    @Override
+    public Student findByUsername(String username) {
+        return repository.findByUsername(username).orElseThrow(() -> new NotFoundException("user not found"));
     }
 
     public Student mapSignUpRequestToStudent(SignupRequest signupRequest) {

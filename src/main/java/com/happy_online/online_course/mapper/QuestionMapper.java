@@ -39,6 +39,7 @@ public interface QuestionMapper {
         questionItem.forEach(item -> {
             QuestionItemResponse questionItemResponse = new QuestionItemResponse();
             questionItemResponse.setAnswer(item.getAnswer());
+            questionItemResponse.setIsRightAnswer(item.getIsRightAnswer());
             questionItemResponses.add(questionItemResponse);
         });
         return questionItemResponses;

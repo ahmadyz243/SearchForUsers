@@ -7,4 +7,5 @@ import lombok.Setter;
 @Setter
 public class QuestionItemResponse {
     private String answer;
+    private Boolean isRightAnswer;
 }

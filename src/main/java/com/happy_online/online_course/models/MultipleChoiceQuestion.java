@@ -14,5 +14,5 @@ import java.util.List;
 public class MultipleChoiceQuestion extends Question {
     @OneToMany(mappedBy = "question", cascade = CascadeType.ALL)
     private List<QuestionItem> questionItemList;
-    private Boolean isRightAnswer;
+
 }

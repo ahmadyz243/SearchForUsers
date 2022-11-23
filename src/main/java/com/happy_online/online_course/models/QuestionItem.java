@@ -20,4 +20,5 @@ public class QuestionItem extends BaseDomain<Long> {
     private Question question;
     @Column(nullable = false)
     private String answer;
+    private Boolean isRightAnswer;
 }

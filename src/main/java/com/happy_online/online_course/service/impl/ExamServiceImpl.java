@@ -45,6 +45,7 @@ public class ExamServiceImpl extends BaseServiceImpl<Exam, Long, ExamRepository>
         Course course = courseService.findById(examCreateRequest.getCourseId());
         Exam exam = mapCreateReqToExam(examCreateRequest);
         exam.setCourse(course);
+        exam.setEndDate(exam.getStartDateAndTime().plusMinutes(exam.getTime()));
         return repository.save(exam);
     }
 

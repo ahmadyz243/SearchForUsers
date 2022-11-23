@@ -48,9 +48,10 @@ public class QuestionServiceImpl extends BaseServiceImpl<Question, Long, Questio
         MultipleChoiceQuestion multipleChoiceQuestion = questionMapper.multipleChoiceQuestionDTOtoMultipleChoiceQuestion(question);
         multipleChoiceQuestion.setCourse(course);
         multipleChoiceQuestion.setTeacher(teacher);
-        multipleChoiceQuestion.getQuestionItemList().forEach(item -> {
-            item.setQuestion(multipleChoiceQuestion);
-        });
+        for (int i = 0; i < question.getQuestionItemList().size(); i++) {
+            multipleChoiceQuestion.getQuestionItemList().get(i).setQuestion(multipleChoiceQuestion);
+            multipleChoiceQuestion.getQuestionItemList().get(i).setIsRightAnswer(question.getQuestionItemList().get(i).getIsRightAnswer());
+        }
         return repository.save(multipleChoiceQuestion);
     }
 

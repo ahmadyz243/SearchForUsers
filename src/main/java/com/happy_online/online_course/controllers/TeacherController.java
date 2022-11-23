@@ -1,8 +1,6 @@
 package com.happy_online.online_course.controllers;
 
-import com.happy_online.online_course.mapper.QuestionMapper;
 import com.happy_online.online_course.models.Course;
-import com.happy_online.online_course.models.DetailedQuestion;
 import com.happy_online.online_course.models.Exam;
 import com.happy_online.online_course.models.Teacher;
 import com.happy_online.online_course.payload.request.*;

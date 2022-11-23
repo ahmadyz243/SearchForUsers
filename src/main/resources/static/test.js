@@ -36,6 +36,41 @@ $(document).ready(function () {
             })
         })
 
+        //Student ---------------------------------------------------------------------------
+        $(".dropdown").click(function (){
+            var studentCoursesCode = "";
+            var studentCourses = getStudentCourses();
+            for (var i = 0; i < studentCourses.length; i++) {
+                studentCoursesCode = studentCoursesCode.concat("<button class=\"studentCourse\" value=\"\">" + studentCourses[i].title + ": " + studentCourses[i].description + "</button>\n");
+            }
+            $(this).html("<button class=\"dropbtn\">My Courses</button>\n" +
+                "        <div class=\"dropdown-content\">\n" +
+                studentCoursesCode +
+                "        </div>");
+            $("#studentCourse").click(function (){
+
+            })
+        })
+
+        function getStudentCourses(){
+            var studentCourses = [];
+            $.ajax({
+                url: "",
+                method: "GET",
+                contentType: "application/json",
+                async: false,
+                dataType: "json",
+                success: function (response) {
+                    studentCourses = response;
+                },
+                error: function (erorMessage) {
+                    console.log(erorMessage);
+                }
+            })
+            return studentCourses;
+        }
+
+
         // MASTER ---------------------------------------------------------------------------
         //GET TEACHER COURSES LIST
         $("#viewTeacherCourses").click(function () {
@@ -59,32 +94,45 @@ $(document).ready(function () {
                     var exam = getExamById(examId);
                     viewTeacherExam(exam);
                     $("#addNewMultipleQuestion").click(function () {
-                        addNewMultipleOptionQuestion(exam);
+                        addNewMultipleOptionQuestion(exam, courseId);
                     })
                     $("#addNewDetailedQuestion").click(function () {
-                        addNewDetailQuestion(exam);
+                        addNewDetailQuestion(exam, courseId);
                     })
                 })
             })
         })
 
-        function viewAddNewDetailQuestionpage() {
+        function viewAddNewDetailQuestionPage(exam, courseId) {
             $("article").html("<h2>add new detail question</h2>\n" +
                 "    <form id=\"newQuestionForm\">\n" +
                 "        <div><b>question text:</b><textarea id=\"questionText\"></textarea></div>\n" +
+                "        <div><b>question title:</b><input id=\"questionTitle\" type='text' placeholder='title'></input></div>\n" +
                 "        <div>\n" +
                 "            <b>enter a default grade for question:  </b><input id=\"questionDefaultGrade\" type=\"number\" step=\"0.01\" placeholder=\"grade\">\n" +
                 "        </div>\n" +
                 "        <input id=\"saveDetailQuestion\" type=\"submit\" value=\"save question\">\n" +
                 "    </form>");
+            $("#saveDetailQuestion").click(function (event){
+                event.preventDefault();
+                var detailQuestion = {
+                    courseId:courseId,
+                    title: $("#questionTitle").val(),
+                    examId: exam.id,
+                    question: $("#questionText").val(),
+                    score: $("#questionDefaultGrade").val()
+                }
+                saveDetailQuestion(detailQuestion);
+                viewTeacherExam(exam);
+            })
         }
 
-        function addNewMultipleOptionQuestion(exam) {
+        function addNewMultipleOptionQuestion(exam, courseId) {
             var multipleOptionQuestion = {
                 examId: exam.id,
                 question: "",
-                title: "gholamAli",
-                courseId: 1,
+                title: "",
+                courseId: courseId,
                 score: 0,
                 questionItemList: []
 
@@ -93,7 +141,6 @@ $(document).ready(function () {
         }
 
         function saveMultipleOptionQuestion(multipleOptionQuestion) {
-            console.log(multipleOptionQuestion);
             $.ajax({
                 url: "/api/teacher/course/exam/add-multiple",
                 method: "POST",
@@ -107,10 +154,6 @@ $(document).ready(function () {
             })
         }
 
-        function addItemToQuestion(multipleOptionQuestion, item) {
-            multipleOptionQuestion.questionItemList.push(item);
-        }
-
         function viewAddNewMultipleOptionQuestionpage(multipleOptionQuestion, exam) {
             var itemsCode = "";
             for (var i = 0; i < multipleOptionQuestion.questionItemList.length; i++) {
@@ -120,6 +163,7 @@ $(document).ready(function () {
             $("article").html("<h2>add new multiple option question</h2>\n" +
                 "    <form id=\"newQuestionForm\">\n" +
                 "        <div><b>question text:</b><textarea id=\"questionText\"></textarea></div>\n" +
+                "        <div><b>question title:</b><input id=\"questionTitle\" type='text' placeholder='title'></input></div>\n" +
                 "        <div>\n" +
                 "            <b>enter a default garde for question:  </b><input id=\"questionDefaultGrade\"  type=\"number\" step=\"0.01\" placeholder=\"grade\">\n" +
                 "        </div>\n" +
@@ -133,6 +177,7 @@ $(document).ready(function () {
                 "        </div>\n" +
                 "        <input id=\"saveMultipleQuestion\" type=\"submit\" value=\"save question\">\n" +
                 "    </form>");
+            $("#questionTitle").val(multipleOptionQuestion.title);
             $("#questionText").html(multipleOptionQuestion.question);
             $("#questionDefaultGrade").val(multipleOptionQuestion.score);
             $("#newItemButton").click(function () {
@@ -140,13 +185,15 @@ $(document).ready(function () {
                     answer: $("#addNewItem").val(),
                     isRightAnswer: false
                 }
+                multipleOptionQuestion.title = $("#questionTitle").val();
                 multipleOptionQuestion.question = $("#questionText").val();
                 multipleOptionQuestion.score = $("#questionDefaultGrade").val();
-                addItemToQuestion(multipleOptionQuestion, questionItem);
+                multipleOptionQuestion.questionItemList.push(questionItem);
                 viewAddNewMultipleOptionQuestionpage(multipleOptionQuestion, exam);
             })
             $("#saveMultipleQuestion").click(function (event) {
                 event.preventDefault();
+                multipleOptionQuestion.title = $("#questionTitle").val();
                 multipleOptionQuestion.question = $("#questionText").val();
                 multipleOptionQuestion.score = $("#questionDefaultGrade").val();
                 saveMultipleOptionQuestion(multipleOptionQuestion);
@@ -155,18 +202,24 @@ $(document).ready(function () {
             })
         }
 
-        function addNewDetailQuestion(exam) {
-            viewAddNewDetailQuestionpage();
-            var detailQuestion = {
-                examId: exam.id,
-                question: $("#questionText").val(),
-                score: $("#questionDefaultGrade").val()
-            }
+        function addNewDetailQuestion(exam, courseId) {
+            viewAddNewDetailQuestionPage(exam, courseId);
             saveDetailQuestion(detailQuestion);
         }
 
         function saveDetailQuestion(detailQuestion) {
-
+            $.ajax({
+                url: "",
+                method: "POST",
+                data: JSON.stringify(detailQuestion),
+                contentType: "application/json",
+                success: function (response) {
+                    alert("saved successful...");
+                },
+                error: function (erorMessage) {
+                    console.log(erorMessage);
+                }
+            })
         }
 
         function getExamById(examId) {
@@ -197,6 +250,7 @@ $(document).ready(function () {
                 "        </form>" +
                 "  <button id=\"editExam\">edit</button>\n" +
                 "        <button id=\"deleteExam\" value=\"" + exam.id + "\">delete exam</button>\n" +
+                "        <button id=\"addFromBank\" value=\"" + exam.id + "\">add question from question bank</button>\n" +
                 "        <div id=\"multipleQuestions\" class=\"questions\">\n" +
                 "            <h2>multiple option questions</h2>";
             var counterM = 1;
@@ -218,20 +272,20 @@ $(document).ready(function () {
                             "<p>" + String.fromCharCode(count) + ") " + exam.examQuestionList[i].question.questionItemList[j].answer + " </p>\n" +
                             "</div>\n");
                     }
-                    viewTeacherExamCode = viewTeacherExamCode.concat("  <div className=\"multipleQuestion question\">\n" +
+                    viewTeacherExamCode = viewTeacherExamCode.concat("<div className=\"multipleQuestion question\">" +
                         "                        <div className=\"questionText\">\n" +
                         "                            <p><b>" + counterM + " : " + exam.examQuestionList[i].question.question +
                         "                     (score: " + exam.examQuestionList[i].score + ")</b></p></div>\n" +
                         itemsCode +
                         "</div>" +
-                        "                <button class=\"editQuestion\">edit question</button>\n" +
+                        "                <button id='editQuestion' value='" + exam.examQuestionList[i].id + "' class=\"editQuestion\">edit question</button>\n" +
                         "                <hr>");
                     counterM++;
                 } else {
                     DetailedQuestions.push(exam.examQuestionList[i]);
                 }
             }
-            viewTeacherExamCode = viewTeacherExamCode.concat("  <button id=\"addNewMultipleQuestion\">add a new multiple option question</button>\n" +
+            viewTeacherExamCode = viewTeacherExamCode.concat("<button id=\"addNewMultipleQuestion\">add a new multiple option question</button></div>" +
                 "            <div id=\"detaledQuestions\" class=\"questions\">\n" +
                 "                <h2>detailed questions</h2>");
             for (let x = 0; x < DetailedQuestions.length; x++) {
@@ -245,13 +299,233 @@ $(document).ready(function () {
                 counterD++;
             }
             viewTeacherExamCode = viewTeacherExamCode.concat("<button id=\"addNewDetailedQuestion\">add a new detailed question</button>\n" +
-                "   </div>\n" +
                 "\n" +
                 "   </div>\n" +
                 "    </div>")
             $("article").html(viewTeacherExamCode);
-        }
+            $("#editQuestion").click(function (){
+                var questionId = $(this).val();
+                editQuestion(questionId, exam);
 
+            })
+            $("#addFromBank").click(function (){
+                addQuestionFromBank(exam);
+            })
+        }
+        function addQuestionFromBank(exam){
+            var questionBank = getQuestionsFromBank(exam.courseId);
+            viewQuestionBank(questionBank, exam);
+        }
+        function viewQuestionBank(questionBank, exam){
+            $("article").html("<div id=\"questionBank\">\n" +
+                "\n" +
+                "        <h2>multiple option questions</h2>\n" +
+                "\n" +
+                "        <div class=\"multipleQuestion\">\n" +
+                "            <h4>java question</h4>\n" +
+                "            <p>score: 3</p>" +
+                "            <p><b>what is java???????????????????????????</b></p>\n" +
+                "            <div class=\"multipleQuestionItems\">\n" +
+                "                <p class=\"greenText\">a) a language</p>\n" +
+                "                <p >b) an operating system</p>\n" +
+                "            </div>\n" +
+                "            <button class=\"addQuestionFromBank\" value=\"\">add to exam</button>\n" +
+                "        </div>\n" +
+                "        <hr>\n" +
+                "        <div class=\"multipleQuestion\">\n" +
+                "            <h4>java question</h4>\n" +
+                "            <p>score: 3</p>" +
+                "            <p><b>what is java???????????????????????????</b></p>\n" +
+                "            <div class=\"multipleQuestionItems\">\n" +
+                "                <p class=\"greenText\">a) a language</p>\n" +
+                "                <p >b) an operating system</p>\n" +
+                "            </div>\n" +
+                "            <button class=\"addQuestionFromBank\" value=\"\">add to exam</button>\n" +
+                "        </div>\n" +
+                "        <hr>\n" +
+                "        <div class=\"multipleQuestion\">\n" +
+                "            <h4>java question</h4>\n" +
+                "            <p>score: 3</p>" +
+                "            <p><b>what is java???????????????????????????</b></p>\n" +
+                "            <div class=\"multipleQuestionItems\">\n" +
+                "                <p class=\"greenText\">a) a language</p>\n" +
+                "                <p >b) an operating system</p>\n" +
+                "            </div>\n" +
+                "            <button class=\"addQuestionFromBank\" value=\"\">add to exam</button>\n" +
+                "        </div>\n" +
+                "        <hr>\n" +
+                "\n" +
+                "        <h2>detail questions</h2>\n" +
+                "\n" +
+                "        <div class=\"detailQuestion\">\n" +
+                "            <h4>java question</h4>\n" +
+                "            <p>score: 3</p>" +
+                "            <p><b>what is java???????????????????????????</b></p>\n" +
+                "            <button class=\"addQuestionFromBank\" value=\"\">add to exam</button>\n" +
+                "        </div>\n" +
+                "        <hr>\n" +
+                "        <div class=\"detailQuestion\">\n" +
+                "            <h4>java question</h4>\n" +
+                "            <p>score: 3</p>" +
+                "            <p><b>what is java???????????????????????????</b></p>\n" +
+                "            <button class=\"addQuestionFromBank\" value=\"\">add to exam</button>\n" +
+                "        </div>\n" +
+                "        <hr>\n" +
+                "        <div class=\"detailQuestion\">\n" +
+                "            <h4>java question</h4>\n" +
+                "            <p>score: 3</p>" +
+                "            <p><b>what is java???????????????????????????</b></p>\n" +
+                "            <button class=\"addQuestionFromBank\" value=\"\">add to exam</button>\n" +
+                "        </div>\n" +
+                "        <hr>\n" +
+                "    </div>");
+            $(".addQuestionFromBank").click(function (){
+                var questionId = $(this).val();
+                addFromQuestionBank(questionId, exam.id);
+
+                for (var i = 0; i < questionBank.length; i++) {
+                    if (questionBank[i].id === questionId){
+                        exam.examQuestionList.push(questionBank[i]);
+                        break;
+                    }
+                }
+
+                viewTeacherExam(exam)
+            })
+        }
+        function addFromQuestionBank(questionId, examId){
+            $.ajax({
+                url: "" + questionId + examId,
+                method: "POST",
+                contentType: "application/json",
+                success: function (response) {
+                    alert("course saved successfully");
+                },
+                error: function (erorMessage) {
+                    console.log(erorMessage);
+                }
+            })
+        }
+        function getQuestionsFromBank(courseId){
+            var questionBank;
+            $.ajax({
+                url: "" + courseId,
+                method: "GET",
+                async: false,
+                contentType: "application/json",
+                success: function (response) {
+                    questionBank = response;
+                },
+                error: function (erorMessage) {
+                    console.log(erorMessage);
+                }
+            })
+            return questionBank;
+        }
+        function editQuestion(questionId, exam){
+            var question = findQuestionById(questionId);
+            viewQuestion(question, exam)
+
+        }
+        function viewQuestion(question, exam){
+            if (question.type == multiple){
+                var itemsCode = "";
+                for (var i = 0; i < question.questionItemList.length; i++) {
+                    var count = i + 97;
+                    itemsCode = itemsCode.concat("<p><input type=\"radio\" name=\"newQuestionItem\" value=\"\" required> " + String.fromCharCode(count) + ") " + multipleOptionQuestion.questionItemList[i].answer + "</p>");
+                }
+                $("article").html("<h2>edit multiple option question</h2>\n" +
+                    "    <form id=\"editQuestionForm\">\n" +
+                    "        <div><b>question text:</b><textarea id=\"questionText\"></textarea></div>\n" +
+                    "        <div><b>question title:</b><input id=\"questionTitle\" type='text' placeholder='title'></input></div>\n" +
+                    "        <div>\n" +
+                    "            <b>question grade:  </b><input id=\"questionDefaultGrade\"  type=\"number\" step=\"0.01\" placeholder=\"grade\">\n" +
+                    "        </div>\n" +
+                    "        <div>\n" +
+                    itemsCode +
+                    "            <p class=\"greenText largerText\">select the right answer</p>\n" +
+                    "        </div>\n" +
+                    "        <div>\n" +
+                    "            <input id=\"addNewItem\" type=\"text\" placeholder=\"enter new item's text here\">\n" +
+                    "            <button type=\"button\" id=\"newItemButton\">add an item</button>\n" +
+                    "        </div>\n" +
+                    "        <input id=\"saveMultipleQuestion\" type=\"submit\" value=\"save edit\">\n" +
+                    "    </form>");
+                $("#questionTitle").val(question.title);
+                $("#questionText").html(question.question);
+                $("#questionDefaultGrade").val(question.score);
+                $("#newItemButton").click(function () {
+                    var questionItem = {
+                        answer: $("#addNewItem").val(),
+                        isRightAnswer: false
+                    }
+                    question.title = $("#questionTitle").val();
+                    question.question = $("#questionText").val();
+                    question.score = $("#questionDefaultGrade").val();
+                    question.questionItemList.push(questionItem);
+                    viewQuestion(question);
+                })
+                $("#saveMultipleQuestion").click(function (event){
+                    event.preventDefault();
+                    question.title = $("#questionTitle").val();
+                    question.question = $("#questionText").val();
+                    question.score = $("#questionDefaultGrade").val();
+                })
+            }else{
+                $("article").html("<h2>edit detail question</h2>\n" +
+                    "    <form id=\"newQuestionForm\">\n" +
+                    "        <div><b>question text:</b><textarea id=\"questionText\">" + question.question + "</textarea></div>\n" +
+                    "        <div><b>question title:</b><input id=\"questionTitle\" type='text' placeholder='title'></input></div>\n" +
+                    "        <div>\n" +
+                    "            <b>enter a default grade for question:  </b><input id=\"questionDefaultGrade\" type=\"number\" step=\"0.01\" placeholder=\"grade\">\n" +
+                    "        </div>\n" +
+                    "        <input id=\"saveDetailQuestion\" type=\"submit\" value=\"update question\">\n" +
+                    "    </form>");
+                $("#questionTitle").val(question.title);
+                $("#questionDefaultGrade").val(question.score);
+                $("#saveDetailQuestion").click(function (event){
+                    event.preventDefault();
+                    question.title = $("#questionTitle").val();
+                    question.question = $("#questionText").val();
+                    question.score = $("#questionDefaultGrade").val();
+                })
+            }
+            updateQuestion(question);
+            exam.examQuestionList.push(multipleOptionQuestion);
+            viewTeacherExam(exam);
+        }
+        function updateQuestion(question){
+            $.ajax({
+                url: "",
+                method: "POST",
+                contentType: "application/json",
+                data: JSON.stringify(question),
+                success: function (response) {
+                    console.log(response);
+                    alert("question updated successfully");
+                },
+                error: function (erorMessage) {
+                    console.log(erorMessage);
+                }
+            })
+        }
+        function findQuestionById(questionId){
+            var question = {};
+            $.ajax({
+                url: "",
+                method: "GET",
+                contentType: "application/json",
+                async: false,
+                dataType: "json",
+                success: function (response) {
+                    question = response;
+                },
+                error: function (erorMessage) {
+                    console.log(erorMessage);
+                }
+            })
+            return question;
+        }
         function addNewExam(courseId) {
             $("article").html("<form id=\"newExamForm\">\n" +
                 "        <div>exam time(per minute):<br><input id='time' type=\"number\" max=\"180\" min=\"1\" placeholder=\"time\"></div>\n" +

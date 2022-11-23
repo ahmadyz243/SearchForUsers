@@ -53,6 +53,11 @@ h2{
     text-align: center;
 }
 
+hr{
+    width: 95%;
+    border: 2px dashed rgb(0, 0, 0);
+}
+
 .masterCourse{
     display: flex;
     justify-content: space-around;
@@ -113,6 +118,18 @@ h2{
 
 .largerText{
     font-size: larger;
+}
+
+.multipleQuestion{
+    padding-left: 20px;
+}
+
+.addQuestionFromBank{
+    margin-left: 30%;
+    width: 35%;
+    height: 25px;
+    margin-top: 10px;
+    margin-bottom: 10px;
 }
 
 #addTestButton{
@@ -216,6 +233,11 @@ h2{
     width: 98%;
 }
 
+
+#questionTitle{
+    margin-bottom: 15px;
+}
+
 #questionText{
     margin-bottom: 10px;
     height: 90px;
@@ -250,6 +272,12 @@ h2{
 
 #questionDefaultGrade{
     width: 10%;
+}
+
+#questionBank{
+    display: flex;
+    width: 100%;
+    flex-direction: column;
 }
 
 ::placeholder {

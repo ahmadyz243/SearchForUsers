@@ -22,6 +22,12 @@ public class AdminCo {
         return "views/master-menu";
     }
 
+    @GetMapping("/student-menu")
+    public String student() {
+
+        return "views/student-menu";
+    }
+
     @GetMapping("/signup")
     public String signup() {
 

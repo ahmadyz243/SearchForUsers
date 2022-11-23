@@ -26,12 +26,16 @@ public class Exam extends BaseDomain<Long> {
     private String description;
     @Column(nullable = false, name = "startsDate")
     private LocalDateTime startDateAndTime;
+    @Column(nullable = false, name = "endDate")
+    private LocalDateTime endDate;
 
     @Column(nullable = false, name = "examTime")
     private Integer time;
 
     @OneToMany(mappedBy = "exam", cascade = CascadeType.ALL)
     private List<ExamQuestion> examQuestionList = new ArrayList<>();
+    @OneToMany(mappedBy = "exam")
+    private List<StudentsAnswers> studentsAnswers;
 
     public void setCourse(Course course) {
         this.course = course;
@@ -57,4 +61,7 @@ public class Exam extends BaseDomain<Long> {
         this.examQuestionList.add(examQuestionList);
     }
 
+    public void setEndDate(LocalDateTime endDate) {
+        this.endDate = endDate;
+    }
 }

@@ -4,6 +4,7 @@ import com.happy_online.online_course.exception.NotFoundException;
 import com.happy_online.online_course.models.Course;
 import com.happy_online.online_course.models.Student;
 import com.happy_online.online_course.models.Teacher;
+import com.happy_online.online_course.payload.CourseInfoResponseForStudent;
 import com.happy_online.online_course.payload.request.CreateCourseRequest;
 import com.happy_online.online_course.payload.response.CourseInfoResponse;
 import com.happy_online.online_course.payload.response.CourseInfoResponseTeacher;
@@ -126,6 +127,14 @@ public class CourseServiceImpl extends BaseServiceImpl<Course, Long, CourseRepos
         List<CourseInfoResponseTeacher> courseInfoResponses = new ArrayList<>();
         course.forEach(current -> courseInfoResponses.add(mapCourseToResponseSolver(current)));
         return courseInfoResponses;
+    }
+
+    @Override
+    public List<CourseInfoResponseForStudent> findStudentCourses(String studentUsername) {
+        Student student = studentService.findByUsername(studentUsername);
+        List<Course> studentCourses = repository.findByStudentListContaining(student);
+
+        return null;
     }
 
     private CourseInfoResponseTeacher mapCourseToResponseSolver(Course course) {

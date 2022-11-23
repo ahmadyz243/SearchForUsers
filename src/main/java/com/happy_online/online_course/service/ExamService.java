@@ -28,4 +28,6 @@ public interface ExamService extends BaseService<Exam, Long> {
     void addMultipleChoiceQuestion(MultipleChoiceQuestionDTO multipleChoiceQuestion);
 
     ExamResponseForView mapExamToExamResponseForView(Exam exams);
+
+    ExamResponseForView findByIdForStart(Long exam_id, String studentUsername);
 }

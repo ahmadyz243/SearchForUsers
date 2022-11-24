@@ -5,15 +5,8 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class DetailedQuestionDTO {
-
+public class ExamQuestionInfo {
+    private Long questionId;
     private Long examId;
-
     private Double score;
-
-    private Long courseId;
-
-    private String title;
-
-    private String question;
 }

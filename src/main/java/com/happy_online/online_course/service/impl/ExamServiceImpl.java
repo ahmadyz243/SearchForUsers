@@ -5,7 +5,9 @@ import com.happy_online.online_course.models.Course;
 import com.happy_online.online_course.models.Exam;
 import com.happy_online.online_course.models.ExamQuestion;
 import com.happy_online.online_course.models.Question;
+import com.happy_online.online_course.payload.request.DetailedQuestionDTO;
 import com.happy_online.online_course.payload.request.ExamCreateRequest;
+import com.happy_online.online_course.payload.request.ExamQuestionInfo;
 import com.happy_online.online_course.payload.request.MultipleChoiceQuestionDTO;
 import com.happy_online.online_course.payload.response.ExamResponseForUpdate;
 import com.happy_online.online_course.payload.response.ExamResponseForView;
@@ -84,12 +86,13 @@ public class ExamServiceImpl extends BaseServiceImpl<Exam, Long, ExamRepository>
 
     @Override
     @Transactional
-    public void addQuestion(Long examId, Long questionId) {
-        Exam exam = findById(examId);
+    public void addQuestion(ExamQuestionInfo questionInfo) {
+        Exam exam = findById(questionInfo.getExamId());
         ExamQuestion examQuestion = new ExamQuestion();
-        Question question = questionService.findById(questionId);
+        Question question = questionService.findById(questionInfo.getQuestionId());
         examQuestion.setQuestion(question);
         examQuestion.setExam(exam);
+        examQuestion.setScore(questionInfo.getScore());
         exam.setExamQuestionList(examQuestion);
     }
 
@@ -126,6 +129,12 @@ public class ExamServiceImpl extends BaseServiceImpl<Exam, Long, ExamRepository>
             }
         });
         return mapExamToExamResponseForView(exam);
+    }
+
+    @Override
+    public void addDetailedQuestion(DetailedQuestionDTO detailedQuestion) {
+        Question question = questionService.save(detailedQuestion);
+        addQuestion(detailedQuestion.getExamId(), question, detailedQuestion.getScore());
     }
 
     private Exam mapCreateReqToExam(ExamCreateRequest examCreateRequest) {

@@ -61,6 +61,50 @@
 
       </table>
       -->
+
+
+        <!--
+        <div id="examination">
+            <h2 id="timeRemaining">time remaining</h2>
+            <script>
+                var min = 3;
+                var second = 0;
+                var x = setInterval(function(){
+                    if(second <= 0){
+                        if(min > 0){
+                            min--;
+                            second+=60;
+                        }else{
+                            clearInterval(x);
+                        }
+                    }else{
+                        second--;
+                        $("#timeRemaining").html(min + " min & " + second + " seconds");
+                    }
+                }, 1000)
+            </script>
+
+            <div class="examMultipleQuestion">
+
+            </div>
+
+            <p><b>1. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quo minus modi illum? Minima similique laborum fugiat nisi. Praesentium officiis, numquam optio, rem quas minima aliquam illum iure eveniet ipsam dolores.(score: 5)</b></p>
+            ----------------------------------------
+            <div class="multipleQuestionOptions">
+              <p><input type="radio" value="">a) est laudantium quae, fuga impedit, fugiat voluptas!</p>
+              <p><input type="radio" value="">b) est laudantium quae, fuga impedit, fugiat voluptas!</p>
+              <p><input type="radio" value="">c) est laudantium quae, fuga impedit, fugiat voluptas!</p>
+              <p><input type="radio" value="">d) est laudantium quae, fuga impedit, fugiat voluptas!</p>
+            </div>
+            -----------------------------------------------------
+            <textarea class="detailQuestionAnswers" placeholder="write your answer here"></textarea>
+            <div id="buttons">
+                <button class="previous paginationBtn" value="">previous</button>
+                <button class="finish paginationBtn" value="">Finish exam</button>
+                <button class="next paginationBtn" value="">next</button>
+            </div>
+        </div>
+        -->
     </article>
 
     <script src="test.js"></script>

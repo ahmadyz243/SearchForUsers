@@ -9,8 +9,6 @@ import com.happy_online.online_course.service.CourseService;
 import com.happy_online.online_course.service.ExamService;
 import com.happy_online.online_course.service.QuestionService;
 import com.happy_online.online_course.service.TeacherService;
-import lombok.Getter;
-import lombok.Setter;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -61,17 +59,18 @@ public class TeacherController {
     }
 
     //this is a feature for update an exam
-    @GetMapping("/exam/find-for-update/{exam_id}")
-    public ResponseEntity<ExamResponseForUpdate> formFillerUpdateExam(@PathVariable Long exam_id) {
-        ExamResponseForUpdate response = examService.findByIdResponse(exam_id);
-        return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
-    }
+//    @GetMapping("/exam/find-for-update/{exam_id}")
+//    public ResponseEntity<ExamResponseForUpdate> formFillerUpdateExam(@PathVariable Long exam_id) {
+//        ExamResponseForUpdate response = examService.findByIdResponse(exam_id);
+//        return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
+//    }
 
     //it will get the required fields from 'formFillerUpdateExam' method and do the update
     @PutMapping("/exam/update/{exam_id}")
     public ResponseEntity<ExamResponseForUpdate> updateExam(@PathVariable Long exam_id, @RequestBody ExamUpdateRequest updateRequest) {
         Exam exam = examService.findById(exam_id);
         BeanUtils.copyProperties(updateRequest, exam);
+        exam.setEndDate(exam.getStartDateAndTime().plusMinutes(updateRequest.getTime()));
         Exam updated = examService.save(exam);
         ExamResponseForUpdate examResponseForUpdate = new ExamResponseForUpdate();
         BeanUtils.copyProperties(updated, examResponseForUpdate);
@@ -96,14 +95,6 @@ public class TeacherController {
         return new ResponseEntity<>(responseTeachers, HttpStatus.ACCEPTED);
     }
 
-    //add question to question bank
-    @PutMapping(value = "/course/exam/question-bank/add-question", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ExamQuestionInfo> addQuestionToBank(@RequestBody QuestionCreateRequest createRequest) {
-
-
-        return new ResponseEntity<>(HttpStatus.ACCEPTED);
-    }
-
     //at first , we have to find questions in questions bank
     @GetMapping("/course/exam/find-questions/{courseId}")
     public ResponseEntity<List<QuestionResponse>> getCreatedQuestions(@PathVariable Long courseId) {
@@ -116,7 +107,7 @@ public class TeacherController {
     //add question to exam from question bank
     @PutMapping(value = "/course/exam/add-question", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> addQuestion(@RequestBody ExamQuestionInfo questionInfo) {
-        examService.addQuestion(questionInfo.getExamId(), questionInfo.getQuestionId());
+        examService.addQuestion(questionInfo);
         return ResponseEntity.ok("question added");
     }
 
@@ -130,7 +121,7 @@ public class TeacherController {
     // add detailed question
     @PostMapping("/course/exam/add-detailed-exam")
     public ResponseEntity<?> addDetailedQuestion(@RequestBody DetailedQuestionDTO detailedQuestion) {
-        questionService.save(detailedQuestion);
+        examService.addDetailedQuestion(detailedQuestion);
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
@@ -140,14 +131,6 @@ public class TeacherController {
         Exam exam = examService.findById(exam_id);
         ExamResponseForView examResponse = examService.mapExamToExamResponseForView(exam);
         return new ResponseEntity<>(examResponse, HttpStatus.ACCEPTED);
-    }
-
-
-    @Getter
-    @Setter
-    private static class ExamQuestionInfo {
-        private Long questionId;
-        private Long examId;
     }
 }
 

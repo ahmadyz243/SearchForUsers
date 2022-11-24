@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class ExamUpdateRequest {
-    private LocalDateTime time;
+    private Integer time;
     private LocalDateTime startDateAndTime;
     private String description;
     private String title;

@@ -123,7 +123,7 @@ $(document).ready(function () {
                     score: $("#questionDefaultGrade").val()
                 }
                 saveDetailQuestion(detailQuestion);
-                viewTeacherExam(exam);
+                viewTeacherExam(exam, courseId);
             })
         }
 
@@ -244,10 +244,10 @@ $(document).ready(function () {
         function viewTeacherExam(exam, courseId) {
             var viewTeacherExamCode = " <div id=\"examSection\">\n" +
                 "        <form id=\"examForm\">\n" +
-                "            <input id=\"examTitle\" class=\"examDetails\" type=\"text\" placeholder=\"" + exam.title + "\" disabled>\n" +
-                "            <input disabled id=\"examStartDate\" class=\"examDetails\" type=\"text\" placeholder=\"" + exam.startDateAndTime + "\" onclick=\"(this.type='datetime-local')\">\n" +
-                "            <input id=\"examTime\" class=\"examDetails\" disabled placeholder=\"" + exam.time + "\">\n" +
-                "            <textarea id=\"examDescription\" class=\"examDetails\" disabled placeholder=\"" + exam.description + "\"></textarea>\n" +
+                "            <input id=\"examTitle\" class=\"examDetails\" type=\"text\" value=\"" + exam.title + "\" disabled>\n" +
+                "            <input disabled id=\"examStartDate\" class=\"examDetails\" type=\"text\" value=\"" + exam.startDateAndTime + "\" onclick=\"(this.type='datetime-local')\">\n" +
+                "            <input id=\"examTime\" class=\"examDetails\" disabled value=\"" + exam.time + "\">\n" +
+                "            <textarea id=\"examDescription\" class=\"examDetails\" disabled >" + exam.description + "</textarea>\n" +
                 "            <button id=\"updateExam\" value=\"" + exam.id + "\">update</button>\n" +
                 "        </form>" +
                 "  <button id=\"editExam\">edit</button>\n" +
@@ -293,7 +293,7 @@ $(document).ready(function () {
             for (let x = 0; x < DetailedQuestions.length; x++) {
                 viewTeacherExamCode = viewTeacherExamCode.concat("  <div class=\"detailedQuestion question\">\n" +
                     "                    <div class=\"questionText\">\n" +
-                    "                        <p><b>" + counterD + " : " + DetailedQuestions[x].question.answer + "(score:" + DetailedQuestions[x].score + ")</b></p>\n" +
+                    "                        <p><b>" + counterD + " : " + DetailedQuestions[x].question.question + "(score:" + DetailedQuestions[x].score + ")</b></p>\n" +
                     "                    </div>\n" +
                     "                </div>\n" +
                     "                <button class=\"editQuestion\">edit question</button>\n" +
@@ -305,6 +305,32 @@ $(document).ready(function () {
                 "   </div>\n" +
                 "    </div>")
             $("article").html(viewTeacherExamCode);
+            $("#updateExam").hide();
+            $("#editExam").click(function () {
+                $("#updateExam").show();
+                $("#examTitle").removeAttr("disabled").css("background-color", "white");
+                $("#examStartDate").removeAttr("disabled").css("background-color", "white");
+                $("#examTime").removeAttr("disabled").css("background-color", "white");
+                $("#examDescription").removeAttr("disabled").css("background-color", "white");
+                $("#updateExam").click(function (event) {
+                    event.preventDefault();
+                    var examTitle = $("#examTitle").val();
+                    var examStartDate = $("#examStartDate").val();
+                    var examTime = $("#examTime").val();
+                    var examDescription = $("#examDescription").val();
+                    if (examTitle !== null && examTitle !== "" && examStartDate !== null && examStartDate !== "" && examTime !== null && examTime !== "" && examDescription !== null && examDescription !== "") {
+                        exam.time = examTime;
+                        exam.title = examTitle;
+                        exam.description = examDescription;
+                        exam.startDateAndTime = examStartDate;
+                        updateExam(exam)
+                    } else {
+                        alert("fields can not be null!")
+                    }
+                    viewTeacherExam(exam, courseId);
+                });
+            });
+
             $("#deleteExam").click(function () {
                 var examId = $("#deleteExam").val();
                 deleteExam(examId);
@@ -317,6 +343,21 @@ $(document).ready(function () {
             })
             $("#addFromBank").click(function () {
                 addQuestionFromBank(exam, courseId);
+            })
+        }
+
+        function updateExam(exam) {
+            $.ajax({
+                url: "/api/teacher/exam/update/" + exam.id,
+                method: "PUT",
+                contentType: "application/json",
+                data: JSON.stringify(exam),
+                success: function (response) {
+                    alert("exam updated successfully");
+                },
+                error: function (erorMessage) {
+                    console.log(erorMessage);
+                }
             })
         }
 
@@ -340,7 +381,6 @@ $(document).ready(function () {
         }
 
         function viewQuestionBank(questionBank, exam) {
-            console.log(questionBank);
             var viewQuestionBankCode = "<div id=\"questionBank\">\n" +
                 "<h2>multiple option questions</h2>";
             var multipleQuestions = [];
@@ -368,7 +408,6 @@ $(document).ready(function () {
                 }
                 viewQuestionBankCode = viewQuestionBankCode.concat("<div class=\"multipleQuestion\">\n" +
                     "    <h4>" + multipleQuestions[i].title + "</h4>\n" +
-                    "score: <input required type='number' step=\"0.01\">" +
                     "    <p><b>" + multipleQuestions[i].question + "</b></p>\n" +
                     "    <div class=\"multipleQuestionItems\">\n" +
                     itemsCode +
@@ -382,7 +421,6 @@ $(document).ready(function () {
             for (let i = 0; i < detailQuestions.length; i++) {
                 viewQuestionBankCode = viewQuestionBankCode.concat("<div class=\"detailQuestion\">\n" +
                     "            <h4>" + detailQuestions[i].title + "</h4>\n" +
-                    "score: <input required type='number' step=\"0.01\"> <br>" +
                     "            <p><b>" + detailQuestions[i].question + "</b></p>\n" +
                     "            <button class=\"addQuestionFromBank\" value=\"" + detailQuestions[i].id + "\">add to exam</button>\n" +
                     "        </div>\n" +
@@ -391,27 +429,37 @@ $(document).ready(function () {
             viewQuestionBankCode = viewQuestionBankCode.concat("<div/>");
             $("article").html(viewQuestionBankCode);
             $(".addQuestionFromBank").click(function () {
-                var questionId = $(this).val();
-                addFromQuestionBank(questionId, exam.id);
-
-                for (var i = 0; i < questionBank.length; i++) {
-                    if (questionBank[i].id === questionId) {
-                        exam.examQuestionList.push(questionBank[i]);
-                        break;
-                    }
+                var questionInfo = {
+                    questionId: $(this).val(),
+                    score: $(".grade").val(),
+                    examId: exam.id
                 }
 
-                viewTeacherExam(exam)
+                $("article").html("score: <input class='grade' required type='number' step=\"0.01\"> <br> " +
+                    "<button id='submitForScore'>add score</button>");
+                $("#submitForScore").click(function () {
+                    var grade = $(".grade").val();
+                    questionInfo.score = grade;
+                    for (var i = 0; i < questionBank.length; i++) {
+                        if (questionBank[i].id === questionInfo.questionId) {
+                            exam.examQuestionList.push(questionBank[i]);
+                            break;
+                        }
+                    }
+                    addFromQuestionBank(questionInfo);
+                    viewTeacherExam(exam)
+                })
             })
         }
 
-        function addFromQuestionBank(questionId, examId) {
+        function addFromQuestionBank(questionInfo) {
             $.ajax({
-                url: "" + questionId + examId,
-                method: "POST",
+                url: "/api/teacher/course/exam/add-question",
+                method: "PUT",
                 contentType: "application/json",
+                data: JSON.stringify(questionInfo),
                 success: function (response) {
-                    alert("course saved successfully");
+                    alert("question added successfully");
                 },
                 error: function (erorMessage) {
                     console.log(erorMessage);

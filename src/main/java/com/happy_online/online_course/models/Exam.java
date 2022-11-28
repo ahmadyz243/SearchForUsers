@@ -31,7 +31,8 @@ public class Exam extends BaseDomain<Long> {
 
     @Column(nullable = false, name = "examTime")
     private Integer time;
-
+    @OneToMany(mappedBy = "exam")
+    private List<StudentGrade> studentGrades;
     @OneToMany(mappedBy = "exam", cascade = CascadeType.ALL)
     private List<ExamQuestion> examQuestionList = new ArrayList<>();
     @OneToMany(mappedBy = "exam")

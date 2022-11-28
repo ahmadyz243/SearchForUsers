@@ -41,21 +41,150 @@ $(document).ready(function () {
             var studentCoursesCode = "";
             var studentCourses = getStudentCourses();
             for (var i = 0; i < studentCourses.length; i++) {
-                studentCoursesCode = studentCoursesCode.concat("<button class=\"studentCourse\" value=\"\">" + studentCourses[i].title + ": " + studentCourses[i].description + "</button>\n");
+                studentCoursesCode = studentCoursesCode.concat("<button class=\"studentCourse\" value=\"" + studentCourses[i].id + "\">" + studentCourses[i].title + ": " + studentCourses[i].description + "</button>\n");
             }
             $(this).html("<button class=\"dropbtn\">My Courses</button>\n" +
                 "        <div class=\"dropdown-content\">\n" +
                 studentCoursesCode +
                 "        </div>");
-            $("#studentCourse").click(function () {
-
+            $(".studentCourse").click(function () {
+                var courseId = $(this).val();
+                var studentCourse = {};
+                for (let i = 0; i < studentCourses.length; i++) {
+                    if (studentCourses[i].id == courseId) {
+                        studentCourse = studentCourses[i];
+                        break;
+                    }
+                }
+                console.log(studentCourse);
+                viewStudentCourse(studentCourse);
             })
         })
+
+        function viewStudentCourse(course) {
+            var viewStudentCourseCode = " <table>\n" +
+                "        <caption><b>My Exams</b></caption>\n" +
+                "        <tr>\n" +
+                "          <th>#</th>\n" +
+                "          <th>title</th>\n" +
+                "          <th>description</th>\n" +
+                "          <th>start date</th>\n" +
+                "          <th>exam time(min)</th>\n" +
+                "          <th>status</th>\n" +
+                "          <th>grade</th>\n" +
+                "        </tr>\n";
+            for (let i = 0; i < course.examList.length; i++) {
+                var status = "";
+                if (course.examList[i].enabled === true) {
+                    status = "          <td><button value=\"" + course.examList[i].id + "\" class=\"startExam\">start exam</button></td>\n"
+                } else {
+                    status = "<td> not available </td>";
+                }
+                viewStudentCourseCode = viewStudentCourseCode +
+                    "        <tr>\n" +
+                    "          <td>" + (i + 1) + "</td>\n" +
+                    "          <td>" + course.examList[i].title + "</td>\n" +
+                    "          <td>" + course.examList[i].description + "</td>\n" +
+                    "          <td>" + course.examList[i].startDateAndTime + "</td>\n" +
+                    "          <td>" + course.examList[i].time + "</td>\n" +
+                    status +
+                    "          <td>-</td>\n" +
+                    "        </tr>\n";
+            }
+            $("article").html(viewStudentCourseCode + "</table>");
+            $(".startExam").click(function () {
+                var examId = $(this).val();
+                var exam = {};
+                var questionList = findQuestionsByExamId(examId);
+                for (let i = 0; i < course.examList.length; i++) {
+                    if (examId === course.examList[i]) {
+                        exam = course.examList[i];
+                        break;
+                    }
+                }
+                startExam(questionList, exam);
+            })
+        }
+
+        function findQuestionsByExamId(examId) {
+            var questions = [];
+            $.ajax({
+                url: "/api/student/course/exam/get-questions/" + examId,
+                method: "GET",
+                contentType: "application/json",
+                async: false,
+                dataType: "json",
+                success: function (response) {
+                    questions = response;
+                },
+                error: function (erorMessage) {
+                    console.log(erorMessage);
+                }
+            })
+            return questions;
+        }
+
+        function startExam(questionList, exam) {
+            var question = "";
+            var score = "";
+            var multipleQuestion = [];
+            var detailQuestion = [];
+            for (let i = 0; i < questionList.length; i++) {
+                if (questionList[i].question.questionItemList !== null) {
+                    multipleQuestion.push(questionList[i]);
+                } else {
+                    detailQuestion.push(questionList[i]);
+                }
+            }
+            if (multipleQuestion.length !== 0) {
+                question = multipleQuestion[0].question;
+                score = multipleQuestion[0].score;
+            }
+            $("article").html(" <div id=\"examination\">\n" +
+                "            <h2 id=\"timeRemaining\">time remaining</h2>\n" +
+                "            <script>\n" +
+                "                var min = " + exam.time + ";\n" +
+                "                var second = 0;\n" +
+                "                var x = setInterval(function(){\n" +
+                "                    if(second <= 0){\n" +
+                "                        if(min > 0){\n" +
+                "                            min--;\n" +
+                "                            second+=60;\n" +
+                "                        }else{\n" +
+                "                            clearInterval(x);\n" +
+                "                        }\n" +
+                "                    }else{\n" +
+                "                        second--;\n" +
+                "                        $(\"#timeRemaining\").html(min + \" min & \" + second + \" seconds\");\n" +
+                "                    }\n" +
+                "                }, 1000)\n" +
+                "            </script>\n" +
+                "\n" +
+                "            <div class=\"examMultipleQuestion\">\n" +
+                "\n" +
+                "            </div>" +
+                " <p><b>1. " + question + "(score: " + score + ")</b></p>\n" +
+                "            ----------------------------------------\n" +
+                // "            <div class=\"multipleQuestionOptions\">\n" +
+                // "              <p><input type=\"radio\" value=\"\">a) est laudantium quae, fuga impedit, fugiat voluptas!</p>\n" +
+                // "              <p><input type=\"radio\" value=\"\">b) est laudantium quae, fuga impedit, fugiat voluptas!</p>\n" +
+                // "              <p><input type=\"radio\" value=\"\">c) est laudantium quae, fuga impedit, fugiat voluptas!</p>\n" +
+                // "              <p><input type=\"radio\" value=\"\">d) est laudantium quae, fuga impedit, fugiat voluptas!</p>\n" +
+                // "            </div>\n" +
+                "            -----------------------------------------------------\n" +
+                "            <textarea class=\"detailQuestionAnswers\" placeholder=\"write your answer here\"></textarea>\n" +
+                "            <div id=\"buttons\">\n" +
+                "                <button class=\"previous paginationBtn\" value=\"\">previous</button>\n" +
+                "                <button class=\"finish paginationBtn\" value=\"\">Finish exam</button>\n" +
+                "                <button class=\"next paginationBtn\" value=\"\">next</button>\n" +
+                "            </div>\n" +
+                "        </div>")
+        }
 
         function getStudentCourses() {
             var studentCourses = [];
             $.ajax({
-                url: "",
+                url: "/api/student/course/all",
                 method: "GET",
                 contentType: "application/json",
                 async: false,
@@ -280,7 +409,7 @@ $(document).ready(function () {
                         "                     (score: " + exam.examQuestionList[i].score + ")</b></p></div>\n" +
                         itemsCode +
                         "</div>" +
-                        "                <button id='editQuestion' value='" + exam.examQuestionList[i].id + "' class=\"editQuestion\">edit question</button>\n" +
+                        "                <button id='editQuestion' value='" + exam.examQuestionList[i].question.id + "' class=\"editQuestion\">edit question</button>\n" +
                         "                <hr>");
                     counterM++;
                 } else {
@@ -296,7 +425,7 @@ $(document).ready(function () {
                     "                        <p><b>" + counterD + " : " + DetailedQuestions[x].question.question + "(score:" + DetailedQuestions[x].score + ")</b></p>\n" +
                     "                    </div>\n" +
                     "                </div>\n" +
-                    "                <button class=\"editQuestion\">edit question</button>\n" +
+                    "                <button value='" + DetailedQuestions[x].id + "' class=\"editQuestion\">edit question</button>\n" +
                     "                <hr>")
                 counterD++;
             }
@@ -487,15 +616,14 @@ $(document).ready(function () {
         function editQuestion(questionId, exam) {
             var question = findQuestionById(questionId);
             viewQuestion(question, exam)
-
         }
 
         function viewQuestion(question, exam) {
-            if (question.type == multiple) {
+            if (question.question.questionItemList !== null) {
                 var itemsCode = "";
-                for (var i = 0; i < question.questionItemList.length; i++) {
+                for (var i = 0; i < question.question.questionItemList.length; i++) {
                     var count = i + 97;
-                    itemsCode = itemsCode.concat("<p><input type=\"radio\" name=\"newQuestionItem\" value=\"\" required> " + String.fromCharCode(count) + ") " + multipleOptionQuestion.questionItemList[i].answer + "</p>");
+                    itemsCode = itemsCode.concat("<p><input type=\"radio\" name=\"newQuestionItem\" value=\"\" required> " + String.fromCharCode(count) + ") " + question.question.questionItemList[i].answer + "</p>");
                 }
                 $("article").html("<h2>edit multiple option question</h2>\n" +
                     "    <form id=\"editQuestionForm\">\n" +
@@ -577,7 +705,7 @@ $(document).ready(function () {
         function findQuestionById(questionId) {
             var question = {};
             $.ajax({
-                url: "",
+                url: "/api/teacher/course/exam/find-by-id/" + questionId,
                 method: "GET",
                 contentType: "application/json",
                 async: false,

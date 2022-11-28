@@ -1,13 +1,16 @@
 package com.happy_online.online_course.service.impl;
 
 import com.happy_online.online_course.exception.NotFoundException;
+import com.happy_online.online_course.mapper.CourseMapper;
 import com.happy_online.online_course.models.Course;
+import com.happy_online.online_course.models.Exam;
 import com.happy_online.online_course.models.Student;
 import com.happy_online.online_course.models.Teacher;
 import com.happy_online.online_course.payload.CourseInfoResponseForStudent;
 import com.happy_online.online_course.payload.request.CreateCourseRequest;
 import com.happy_online.online_course.payload.response.CourseInfoResponse;
 import com.happy_online.online_course.payload.response.CourseInfoResponseTeacher;
+import com.happy_online.online_course.payload.response.ExamResponseForStudent;
 import com.happy_online.online_course.payload.response.ViewCoursesResponse;
 import com.happy_online.online_course.repository.CourseRepository;
 import com.happy_online.online_course.service.CourseService;
@@ -17,23 +20,24 @@ import com.happy_online.online_course.service.base.impl.BaseServiceImpl;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.dao.DuplicateKeyException;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class CourseServiceImpl extends BaseServiceImpl<Course, Long, CourseRepository> implements CourseService {
-    public CourseServiceImpl(CourseRepository repository) {
+    public CourseServiceImpl(CourseRepository repository, CourseMapper courseMapper) {
         super(repository);
+        this.courseMapper = courseMapper;
     }
 
     private TeacherService teacherService;
     private StudentService studentService;
+    private final CourseMapper courseMapper;
 
     @Lazy
     @Autowired
@@ -133,8 +137,22 @@ public class CourseServiceImpl extends BaseServiceImpl<Course, Long, CourseRepos
     public List<CourseInfoResponseForStudent> findStudentCourses(String studentUsername) {
         Student student = studentService.findByUsername(studentUsername);
         List<Course> studentCourses = repository.findByStudentListContaining(student);
+        List<CourseInfoResponseForStudent> courseResponse = courseMapper.mapCoursesToCourseInfoResponseForStudentList(studentCourses);
+        for (int i = 0; i < studentCourses.size(); i++) {
+            courseResponse.get(i).setTeacherName(studentCourses.get(i).getTeacher().getName());
+            courseResponse.get(i).setId(studentCourses.get(i).getId());
+            courseResponse.get(i).getExamList().forEach(exam -> {
+                exam.setEnabled(checkForEnableExam(exam));
+            });
+        }
+        return courseResponse;
+    }
 
-        return null;
+    private Boolean checkForEnableExam(ExamResponseForStudent exam) {
+        if (LocalDateTime.now().isAfter(exam.getStartDateAndTime().minusMinutes(1L)) && LocalDateTime.now().isBefore(exam.getEndDate().plusMinutes(1L))) {
+            return true;
+        } else
+            return false;
     }
 
     private CourseInfoResponseTeacher mapCourseToResponseSolver(Course course) {

@@ -4,12 +4,14 @@ import com.happy_online.online_course.mapper.QuestionMapper;
 import com.happy_online.online_course.models.*;
 import com.happy_online.online_course.payload.request.DetailedQuestionDTO;
 import com.happy_online.online_course.payload.request.MultipleChoiceQuestionDTO;
+import com.happy_online.online_course.payload.response.ExamQuestionResponse;
 import com.happy_online.online_course.payload.response.QuestionResponse;
 import com.happy_online.online_course.repository.QuestionRepository;
 import com.happy_online.online_course.service.CourseService;
 import com.happy_online.online_course.service.QuestionService;
 import com.happy_online.online_course.service.TeacherService;
 import com.happy_online.online_course.service.base.impl.BaseServiceImpl;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -65,5 +67,7 @@ public class QuestionServiceImpl extends BaseServiceImpl<Question, Long, Questio
         detailedQuestion.setTeacher(teacher);
         return repository.save(detailedQuestion);
     }
+
+
 
 }

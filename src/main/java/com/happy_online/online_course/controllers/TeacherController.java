@@ -5,10 +5,7 @@ import com.happy_online.online_course.models.Exam;
 import com.happy_online.online_course.models.Teacher;
 import com.happy_online.online_course.payload.request.*;
 import com.happy_online.online_course.payload.response.*;
-import com.happy_online.online_course.service.CourseService;
-import com.happy_online.online_course.service.ExamService;
-import com.happy_online.online_course.service.QuestionService;
-import com.happy_online.online_course.service.TeacherService;
+import com.happy_online.online_course.service.*;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -28,13 +25,15 @@ public class TeacherController {
     final TeacherService teacherService;
     final ExamService examService;
     final QuestionService questionService;
+    final ExamQuestionService examQuestionService;
 
 
-    public TeacherController(CourseService courseService, TeacherService teacherService, ExamService examService, QuestionService questionService) {
+    public TeacherController(CourseService courseService, TeacherService teacherService, ExamService examService, QuestionService questionService, ExamQuestionService examQuestionService) {
         this.courseService = courseService;
         this.teacherService = teacherService;
         this.examService = examService;
         this.questionService = questionService;
+        this.examQuestionService = examQuestionService;
     }
 
     @GetMapping("/find/courses")
@@ -130,6 +129,13 @@ public class TeacherController {
     public ResponseEntity<ExamResponseForView> getExamQuestions(@PathVariable Long exam_id) {
         Exam exam = examService.findById(exam_id);
         ExamResponseForView examResponse = examService.mapExamToExamResponseForView(exam);
+        return new ResponseEntity<>(examResponse, HttpStatus.ACCEPTED);
+    }
+
+    @GetMapping("/course/exam/find-by-id/{id}")
+    public ResponseEntity<ExamQuestionResponse> findQuestionById(@PathVariable Long id) {
+        String teacherUsername = SecurityContextHolder.getContext().getAuthentication().getName();
+        ExamQuestionResponse examResponse = examQuestionService.findByIdAndTeacher(id, teacherUsername);
         return new ResponseEntity<>(examResponse, HttpStatus.ACCEPTED);
     }
 }

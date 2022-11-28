@@ -6,20 +6,18 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.*;
-import java.util.List;
+import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
 
 @Entity
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class StudentsAnswers extends BaseDomain<Long> {
+public class StudentGrade extends BaseDomain<Long> {
     @ManyToOne
     private Exam exam;
-    @OneToOne
+    private Long score;
+    @ManyToOne
     private Student student;
-    @OneToMany(mappedBy = "studentsAnswers")
-    private List<ExamQuestionAnswer> examQuestionAnswerList;
-    private Long studentGrade;
 }

@@ -8,6 +8,7 @@ import com.happy_online.online_course.payload.request.DetailedQuestionDTO;
 import com.happy_online.online_course.payload.request.ExamCreateRequest;
 import com.happy_online.online_course.payload.request.ExamQuestionInfo;
 import com.happy_online.online_course.payload.request.MultipleChoiceQuestionDTO;
+import com.happy_online.online_course.payload.response.ExamQuestionResponse;
 import com.happy_online.online_course.payload.response.ExamResponseForUpdate;
 import com.happy_online.online_course.payload.response.ExamResponseForView;
 import com.happy_online.online_course.service.base.BaseService;
@@ -35,4 +36,5 @@ public interface ExamService extends BaseService<Exam, Long> {
     ExamResponseForView findByIdForStart(Long exam_id, String studentUsername);
 
     void addDetailedQuestion(DetailedQuestionDTO detailedQuestion);
+
 }

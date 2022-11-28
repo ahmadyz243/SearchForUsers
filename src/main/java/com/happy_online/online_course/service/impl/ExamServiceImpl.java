@@ -9,6 +9,7 @@ import com.happy_online.online_course.payload.request.DetailedQuestionDTO;
 import com.happy_online.online_course.payload.request.ExamCreateRequest;
 import com.happy_online.online_course.payload.request.ExamQuestionInfo;
 import com.happy_online.online_course.payload.request.MultipleChoiceQuestionDTO;
+import com.happy_online.online_course.payload.response.ExamQuestionResponse;
 import com.happy_online.online_course.payload.response.ExamResponseForUpdate;
 import com.happy_online.online_course.payload.response.ExamResponseForView;
 import com.happy_online.online_course.repository.ExamRepository;
@@ -136,6 +137,7 @@ public class ExamServiceImpl extends BaseServiceImpl<Exam, Long, ExamRepository>
         Question question = questionService.save(detailedQuestion);
         addQuestion(detailedQuestion.getExamId(), question, detailedQuestion.getScore());
     }
+
 
     private Exam mapCreateReqToExam(ExamCreateRequest examCreateRequest) {
         Exam exam = new Exam();

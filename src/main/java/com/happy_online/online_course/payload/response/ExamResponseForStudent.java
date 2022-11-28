@@ -8,8 +8,11 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class ExamResponseForStudent {
+    private Long id;
     private String title;
     private String description;
     private LocalDateTime startDateAndTime;
+    private LocalDateTime endDate;
     private Integer time;
+    private Boolean enabled;
 }

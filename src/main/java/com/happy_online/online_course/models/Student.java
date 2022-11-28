@@ -29,4 +29,6 @@ public class Student extends BaseDomain<Long> {
     private String lastname;
     @Column(nullable = false, unique = true)
     private String nationalCode;
+    @OneToMany(mappedBy = "student")
+    private List<StudentGrade> studentGrades;
 }

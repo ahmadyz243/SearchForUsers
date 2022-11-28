@@ -4,6 +4,7 @@ import com.happy_online.online_course.models.*;
 import com.happy_online.online_course.payload.request.DetailedQuestionDTO;
 import com.happy_online.online_course.payload.request.MultipleChoiceQuestionDTO;
 import com.happy_online.online_course.payload.request.QuestionCreateRequest;
+import com.happy_online.online_course.payload.response.ExamQuestionResponse;
 import com.happy_online.online_course.payload.response.QuestionResponse;
 import com.happy_online.online_course.service.base.BaseService;
 
@@ -15,4 +16,5 @@ public interface QuestionService extends BaseService<Question, Long> {
     Question save(MultipleChoiceQuestionDTO question);
 
     Question save(DetailedQuestionDTO question);
+
 }

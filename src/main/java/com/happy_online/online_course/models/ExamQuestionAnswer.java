@@ -19,5 +19,5 @@ public class ExamQuestionAnswer extends BaseDomain<Long> {
     @ManyToOne
     private ExamQuestion examQuestion;
     @ManyToOne
-    private StudentsAnswers studentsAnswers;
+    private StudentAnswers studentAnswers;
 }

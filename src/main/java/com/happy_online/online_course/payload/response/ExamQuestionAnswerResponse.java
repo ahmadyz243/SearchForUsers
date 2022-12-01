@@ -5,8 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ExamQuestionResponse {
+public class ExamQuestionAnswerResponse {
+    private String Answer;
     private Long examQuestionId;
-    private Double score;
-    private QuestionResponse question;
 }

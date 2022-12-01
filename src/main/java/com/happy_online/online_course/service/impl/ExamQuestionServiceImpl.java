@@ -44,7 +44,10 @@ public class ExamQuestionServiceImpl extends BaseServiceImpl<ExamQuestion, Long,
         List<ExamQuestion> examQuestions = repository.findByExam(exam);
         List<ExamQuestionResponse> examQuestionResponses = new ArrayList<>();
         examQuestions.forEach(examQuestion -> {
-            examQuestionResponses.add(examQuestionMapper.examQuestionToExamQuestionResponse(examQuestion));
+            ExamQuestionResponse examQuestionResponse = examQuestionMapper.examQuestionToExamQuestionResponse(examQuestion);
+            examQuestionResponse.setExamQuestionId(examQuestion.getId());
+            examQuestionResponses.add(examQuestionResponse);
+
         });
         return examQuestionResponses;
     }

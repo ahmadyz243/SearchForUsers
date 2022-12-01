@@ -36,7 +36,7 @@ public class Exam extends BaseDomain<Long> {
     @OneToMany(mappedBy = "exam", cascade = CascadeType.ALL)
     private List<ExamQuestion> examQuestionList = new ArrayList<>();
     @OneToMany(mappedBy = "exam")
-    private List<StudentsAnswers> studentsAnswers;
+    private List<StudentAnswers> studentAnswers;
 
     public void setCourse(Course course) {
         this.course = course;

@@ -9,7 +9,6 @@ import com.happy_online.online_course.payload.request.DetailedQuestionDTO;
 import com.happy_online.online_course.payload.request.ExamCreateRequest;
 import com.happy_online.online_course.payload.request.ExamQuestionInfo;
 import com.happy_online.online_course.payload.request.MultipleChoiceQuestionDTO;
-import com.happy_online.online_course.payload.response.ExamQuestionResponse;
 import com.happy_online.online_course.payload.response.ExamResponseForUpdate;
 import com.happy_online.online_course.payload.response.ExamResponseForView;
 import com.happy_online.online_course.repository.ExamRepository;
@@ -19,7 +18,6 @@ import com.happy_online.online_course.service.QuestionService;
 import com.happy_online.online_course.service.base.impl.BaseServiceImpl;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -124,7 +122,7 @@ public class ExamServiceImpl extends BaseServiceImpl<Exam, Long, ExamRepository>
             // TODO: change the exception
             throw new BadCredentialsException("exam is not start or time is up");
         }
-        exam.getStudentsAnswers().forEach(studentsAnswers -> {
+        exam.getStudentAnswers().forEach(studentsAnswers -> {
             if (studentsAnswers.getStudent().getUsername().equals(studentUsername)) {
                 throw new BadCredentialsException("bro you cant join this exam again!");
             }

@@ -288,7 +288,7 @@ hr{
     flex-direction: column;
 }
 
-#teacherLogout{
+.teacherLogout{
     background-color: rgb(140, 19, 19);
 }
 

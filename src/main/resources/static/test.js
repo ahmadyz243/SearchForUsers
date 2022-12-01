@@ -97,13 +97,33 @@ $(document).ready(function () {
                 var exam = {};
                 var questionList = findQuestionsByExamId(examId);
                 for (let i = 0; i < course.examList.length; i++) {
-                    if (examId === course.examList[i]) {
+                    if (examId == course.examList[i].id) {
                         exam = course.examList[i];
                         break;
                     }
                 }
+                console.log(course);
+                console.log(exam);
                 startExam(questionList, exam);
             })
+        }
+
+        function getStudentAnswers(examId) {
+            var answers = [];
+            $.ajax({
+                url: "/api/student/course/exam/get-student-answers/" + examId,
+                method: "GET",
+                contentType: "application/json",
+                async: false,
+                dataType: "json",
+                success: function (response) {
+                    answers = response;
+                },
+                error: function (erorMessage) {
+                    console.log(erorMessage);
+                }
+            })
+            return answers;
         }
 
         function findQuestionsByExamId(examId) {
@@ -125,60 +145,132 @@ $(document).ready(function () {
         }
 
         function startExam(questionList, exam) {
+            var allAnswers = getStudentAnswers(exam.id);
+            var allQuestions = createAllQuestions(questionList, allAnswers);
+            viewExamQuestion(allQuestions, exam, 0, allAnswers, questionList);
+        }
+
+        function createAllQuestions(questionList, allAnswers) {
+            var allQuestions = [];
+            var answer = "";
             var question = "";
-            var score = "";
-            var multipleQuestion = [];
-            var detailQuestion = [];
+            var items = "";
             for (let i = 0; i < questionList.length; i++) {
                 if (questionList[i].question.questionItemList !== null) {
-                    multipleQuestion.push(questionList[i]);
+                    items = "<div class=\"multipleQuestionOptions\">\n";
+                    answer = "";
+                    for (let j = 0; j < allAnswers.length; j++) {
+                        if (allAnswers[j].examQuestionId === questionList[i].question.id) {
+                            answer = allAnswers[j].answer;
+                        }
+                    }
+                    for (let j = 0; j < questionList[i].question.questionItemList.length; j++) {
+                        var count = j + 97;
+                        if (answer === questionList[i].question.questionItemList[j].answer) {
+                            items = items.concat("<p><input  name='item' checked='true' type=\"radio\" value=\"" + questionList[i].examQuestionId + "-" + questionList[i].question.questionItemList[j].answer + "\">" + String.fromCharCode(count) + ") " + questionList[i].question.questionItemList[j].answer + "</p>\n")
+                        } else {
+                            items = items.concat("<p><input name='item' type=\"radio\" value=\"" + questionList[i].examQuestionId + "-" + questionList[i].question.questionItemList[j].answer + "\">" + String.fromCharCode(count) + ") " + questionList[i].question.questionItemList[j].answer + "</p>\n")
+                        }
+
+                    }
+                    items = items.concat("</div>\n")
+                    question = " <p><b>" + (i + 1) + ". " + questionList[i].question.question + "(score: " + questionList[i].score + ")</b></p>\n" + items;
                 } else {
-                    detailQuestion.push(questionList[i]);
+                    answer = "";
+                    for (let j = 0; j < allAnswers.length; j++) {
+                        if (allAnswers[j].examQuestionId === questionList[i].question.id) {
+                            answer = allAnswers[j].answer;
+                        }
+                    }
+                    question = " <p><b>" + (i + 1) + ". " + questionList[i].question.question + "(score: " + questionList[i].score + ")</b> </p>\n" +
+                        "<textarea  class=\"detailQuestionAnswers\" placeholder=\"write your answer here\">" + answer + "</textarea>\n";
                 }
+                allQuestions.push(question);
+                question = "";
             }
-            if (multipleQuestion.length !== 0) {
-                question = multipleQuestion[0].question;
-                score = multipleQuestion[0].score;
-            }
+            return allQuestions;
+        }
+
+        function viewExamQuestion(questions, exam, count, allAnswers, questionList) {
             $("article").html(" <div id=\"examination\">\n" +
                 "            <h2 id=\"timeRemaining\">time remaining</h2>\n" +
-                "            <script>\n" +
-                "                var min = " + exam.time + ";\n" +
-                "                var second = 0;\n" +
-                "                var x = setInterval(function(){\n" +
-                "                    if(second <= 0){\n" +
-                "                        if(min > 0){\n" +
-                "                            min--;\n" +
-                "                            second+=60;\n" +
-                "                        }else{\n" +
-                "                            clearInterval(x);\n" +
-                "                        }\n" +
-                "                    }else{\n" +
-                "                        second--;\n" +
-                "                        $(\"#timeRemaining\").html(min + \" min & \" + second + \" seconds\");\n" +
-                "                    }\n" +
-                "                }, 1000)\n" +
-                "            </script>\n" +
-                "\n" +
-                "            <div class=\"examMultipleQuestion\">\n" +
-                "\n" +
-                "            </div>" +
-                " <p><b>1. " + question + "(score: " + score + ")</b></p>\n" +
-                "            ----------------------------------------\n" +
-                // "            <div class=\"multipleQuestionOptions\">\n" +
-                // "              <p><input type=\"radio\" value=\"\">a) est laudantium quae, fuga impedit, fugiat voluptas!</p>\n" +
-                // "              <p><input type=\"radio\" value=\"\">b) est laudantium quae, fuga impedit, fugiat voluptas!</p>\n" +
-                // "              <p><input type=\"radio\" value=\"\">c) est laudantium quae, fuga impedit, fugiat voluptas!</p>\n" +
-                // "              <p><input type=\"radio\" value=\"\">d) est laudantium quae, fuga impedit, fugiat voluptas!</p>\n" +
-                // "            </div>\n" +
-                "            -----------------------------------------------------\n" +
-                "            <textarea class=\"detailQuestionAnswers\" placeholder=\"write your answer here\"></textarea>\n" +
-                "            <div id=\"buttons\">\n" +
-                "                <button class=\"previous paginationBtn\" value=\"\">previous</button>\n" +
-                "                <button class=\"finish paginationBtn\" value=\"\">Finish exam</button>\n" +
-                "                <button class=\"next paginationBtn\" value=\"\">next</button>\n" +
-                "            </div>\n" +
-                "        </div>")
+                questions[count] +
+                "<div id=\"buttons\">\n" +
+                "<button class=\"previous paginationBtn\" value=\"\">previous</button>\n" +
+                "<button class=\"finish paginationBtn\" value=\"\">Finish exam</button>\n" +
+                "<button class=\"next paginationBtn\" value=\"\">next</button>\n" +
+                "</div>\n" +
+                "</div>"
+            )
+            var min = exam.time;
+            var second = 0;
+            var x = setInterval(function () {
+                if (second <= 0) {
+                    if (min > 0) {
+                        min--;
+                        exam.time = exam.time - 1;
+                        second += 60;
+                    } else {
+                        clearInterval(x);
+                    }
+                } else {
+                    second--;
+                    $("#timeRemaining").html(min + " min & " + second + " seconds");
+                }
+            }, 1000);
+            var studentAnswerReq = {
+                answer: "",
+                examQuestionId: null,
+                exam_id: null
+            }
+
+            $(".next").click(function () {
+                var questionAnswer = "";
+                var questionAnswers = [];
+                if (count < questions.length - 1) {
+                    questionAnswer = $(".detailQuestionAnswers").val();
+                    if (questionAnswer === "" || questionAnswer === null || questionAnswer === undefined) {
+                        questionAnswer = $('input[name="item"]:checked').val();
+                        questionAnswers = questionAnswer.split("-");
+                    }
+                    studentAnswerReq.answer = questionAnswers[1];
+                    studentAnswerReq.examQuestionId = questionAnswers[0];
+                    studentAnswerReq.exam_id = exam.id;
+                    console.log(studentAnswerReq);
+                    console.log(studentAnswerReq.examQuestionId);
+                    for (let i = 0; i < allAnswers.length; i++) {
+                        if (allAnswers[i].examQuestionId == studentAnswerReq.examQuestionId) {
+                            allAnswers[i].answer = studentAnswerReq.answer;
+                            console.log("hi");
+                        }
+                    }
+                    console.log(allAnswers);
+                    setAnswerForStudent(studentAnswerReq)
+                    count++;
+                    console.log(questions[count - 1]);
+                    viewExamQuestion(createAllQuestions(questionList, allAnswers), exam, count, allAnswers, questionList);
+                }
+            })
+            $(".previous").click(function () {
+                if (count !== 0) {
+                    count--;
+                    viewExamQuestion(createAllQuestions(questionList, allAnswers), exam, count, allAnswers, questionList);
+                }
+            })
+        }
+
+        function setAnswerForStudent(studentAnswerReq) {
+            $.ajax({
+                url: "/api/student/course/exam/set-answer",
+                method: "POST",
+                data: JSON.stringify(studentAnswerReq),
+                contentType: "application/json",
+                success: function (response) {
+                },
+                error: function (erorMessage) {
+                    console.log(erorMessage);
+                }
+            })
         }
 
         function getStudentCourses() {

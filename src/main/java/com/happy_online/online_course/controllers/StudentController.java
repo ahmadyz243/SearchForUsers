@@ -1,11 +1,15 @@
 package com.happy_online.online_course.controllers;
 
 import com.happy_online.online_course.payload.CourseInfoResponseForStudent;
+import com.happy_online.online_course.payload.request.StudentAnswerRequest;
+import com.happy_online.online_course.payload.response.ExamQuestionAnswerResponse;
 import com.happy_online.online_course.payload.response.ExamQuestionResponse;
 import com.happy_online.online_course.payload.response.ExamResponseForView;
+import com.happy_online.online_course.payload.response.StudentAnswersResponse;
 import com.happy_online.online_course.service.CourseService;
 import com.happy_online.online_course.service.ExamQuestionService;
 import com.happy_online.online_course.service.ExamService;
+import com.happy_online.online_course.service.StudentAnswersService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,11 +23,13 @@ public class StudentController {
     private final CourseService courseService;
     private final ExamService examService;
     private final ExamQuestionService examQuestionService;
+    private final StudentAnswersService studentAnswersService;
 
-    public StudentController(CourseService courseService, ExamService examService, ExamQuestionService examQuestionService) {
+    public StudentController(CourseService courseService, ExamService examService, ExamQuestionService examQuestionService, StudentAnswersService studentAnswersService) {
         this.courseService = courseService;
         this.examService = examService;
         this.examQuestionService = examQuestionService;
+        this.studentAnswersService = studentAnswersService;
     }
 
     @GetMapping("/course/all")
@@ -39,10 +45,30 @@ public class StudentController {
         ExamResponseForView examDetails = examService.findByIdForStart(exam_id, studentUsername);
         return new ResponseEntity<>(examDetails, HttpStatus.ACCEPTED);
     }
+
     @GetMapping("/course/exam/get-questions/{exam_id}")
     public ResponseEntity<List<ExamQuestionResponse>> getQuestionForStart(@PathVariable Long exam_id) {
         List<ExamQuestionResponse> examQuestionResponses = examQuestionService.findAllByExamId(exam_id);
         return new ResponseEntity<>(examQuestionResponses, HttpStatus.ACCEPTED);
     }
+
+    @GetMapping("/course/exam/get-student-answers/{exam_id}")
+    public ResponseEntity<List<ExamQuestionAnswerResponse>> getStudentAnswer(@PathVariable Long exam_id) {
+        List<ExamQuestionAnswerResponse> examQuestionAnswerResponses = studentAnswersService.findStudentAnswers(exam_id);
+        return new ResponseEntity<>(examQuestionAnswerResponses, HttpStatus.ACCEPTED);
+    }
+
+    @PostMapping("/course/exam/set-answer")
+    public ResponseEntity<?> setAnswer(@RequestBody StudentAnswerRequest answerRequest) {
+        studentAnswersService.addAnswer(answerRequest);
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+    }
+
+//    @PostMapping("/course/exam/auto-set-grade/{exam_id}}")
+//    public ResponseEntity<?> autoSetGrade(@PathVariable Long exam_id ) {
+//اهههههههههههههههههههههههههههههههههههههههههههههههههههههههههههههههههههههههههههههههههههههههههههههههههههههههههه
+//        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+//    }
+
 
 }

@@ -31,4 +31,8 @@ public class Student extends BaseDomain<Long> {
     private String nationalCode;
     @OneToMany(mappedBy = "student")
     private List<StudentGrade> studentGrades;
+
+    public void setStudentGrades(StudentGrade studentGrades) {
+        this.studentGrades.add(studentGrades);
+    }
 }

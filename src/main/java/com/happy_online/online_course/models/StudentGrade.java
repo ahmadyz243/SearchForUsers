@@ -18,9 +18,13 @@ import javax.persistence.OneToOne;
 public class StudentGrade extends BaseDomain<Long> {
     @ManyToOne
     private Exam exam;
-    private Long score;
+    private Double score = 0D;
     @ManyToOne
     private Student student;
     @OneToOne
     private StudentAnswers studentAnswers;
+    private Boolean isAutoSet = false;
+    public void setScore(Double score) {
+        this.score = this.score + score;
+    }
 }

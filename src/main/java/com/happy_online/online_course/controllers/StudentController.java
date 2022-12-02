@@ -63,5 +63,11 @@ public class StudentController {
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
+    @PostMapping("/course/exam/finish")
+    public ResponseEntity<?> finishExam() {
+
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+    }
+
 
 }

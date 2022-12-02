@@ -40,11 +40,17 @@ public class StudentAnswersServiceImpl extends BaseServiceImpl<StudentAnswers, L
         if (LocalDateTime.now().isBefore(exam.getEndDate())) {
             Optional<StudentAnswers> answers = repository.findByStudentAndExam(student, exam);
             answers = answers.or(() -> {
+                StudentGrade studentGrade = new StudentGrade();
                 StudentAnswers studentAnswers1 = new StudentAnswers();
                 studentAnswers1.setStudent(student);
                 studentAnswers1.setExam(exam);
+                studentGrade.setStudent(student);
+                studentGrade.setExam(exam);
+                studentAnswers1.setGrade(studentGrade);
+                studentGrade.setStudentAnswers(studentAnswers1);
                 return Optional.of(studentAnswers1);
             });
+
             List<Integer> integers = new ArrayList<>();
             answers.get().getExamQuestionAnswerList().forEach(answer -> {
                 if (answer.getExamQuestion().getId().equals(answerRequest.getExamQuestionId())) {

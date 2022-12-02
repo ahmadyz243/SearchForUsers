@@ -473,6 +473,7 @@ $(document).ready(function () {
                 "        </form>" +
                 "  <button id=\"editExam\">edit</button>\n" +
                 "        <button id=\"deleteExam\" value=\"" + exam.id + "\">delete exam</button>\n" +
+                "        <button id=\"viewStudentsResponses\" value=\"" + exam.id + "\">view answers</button>\n" +
                 "        <button id=\"addFromBank\" value=\"" + exam.id + "\">add question from question bank</button>\n" +
                 "        <div id=\"multipleQuestions\" class=\"questions\">\n" +
                 "            <h2>multiple option questions</h2>";

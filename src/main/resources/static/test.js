@@ -558,6 +558,71 @@ $(document).ready(function () {
                 deleteExam(examId);
                 $("article").html("");
             })
+            $("#viewStudentsResponses").click(function (){
+                $("article").html("<div id=\"teacherViewStudentsAnswers\">\n" +
+
+                    "        <div class=\"studentsAnswers\">\n" +
+                    "            Ahmad Yazdi\n" +
+                    "        </div>\n" +
+                    "        <div class=\"studentsAnswers\">\n" +
+                    "            Ahmad Yazdi\n" +
+                    "        </div>\n" +
+                    "        <div class=\"studentsAnswers\">\n" +
+                    "            Ahmad Yazdi\n" +
+                    "        </div>\n" +
+
+                    "    </div>");
+                $(".studentsAnswers").click(function (){
+                    $("article").html("<div id=\"teacherViewStudentAnswers\">\n" +
+                        "        <h2>Ahmad Yazdi</h2>\n" +
+                        "\n" +
+                        "        <div class=\"teacherViewMultipleAnswers\">\n" +
+                        "            <p><b>Question 1:</b> Lorem ipsum dolor sit amet consectetur adipisicing elit. Ratione voluptates, labore repellat nostrum nemo fuga magnam odio, eius numquam incidunt omnis. Totam deserunt optio ab itaque labore officia quos placeat?(score: 3)</p>\n" +
+                        "            <p><b>Student Answer:</b> Option 1(ex mollitia voluptatem laborum ullam? Provident, autem eum)</p>\n" +
+                        "            <p><b>earned score:</b> 3</p>\n" +
+                        "            <hr>\n" +
+                        "        </div>\n" +
+                        "\n" +
+                        "        <div class=\"teacherViewMultipleAnswers\">\n" +
+                        "            <p><b>Question 2:</b> Lorem ipsum dolor sit amet consectetur adipisicing elit. Ratione voluptates, labore repellat nostrum nemo fuga magnam odio, eius numquam incidunt omnis. Totam deserunt optio ab itaque labore officia quos placeat?(score: 3)</p>\n" +
+                        "            <p><b>Student Answer:</b> Option 1(ex mollitia voluptatem laborum ullam? Provident, autem eum)</p>\n" +
+                        "            <p><b>earned score:</b> 3</p>\n" +
+                        "            <hr>\n" +
+                        "        </div>\n" +
+                        "\n" +
+                        "        <div class=\"teacherViewMultipleAnswers\">\n" +
+                        "            <p><b>Question 3:</b> Lorem ipsum dolor sit amet consectetur adipisicing elit. Ratione voluptates, labore repellat nostrum nemo fuga magnam odio, eius numquam incidunt omnis. Totam deserunt optio ab itaque labore officia quos placeat?(score: 3)</p>\n" +
+                        "            <p><b>Student Answer:</b> Option 1(ex mollitia voluptatem laborum ullam? Provident, autem eum)</p>\n" +
+                        "            <p><b>earned score:</b> 3</p>\n" +
+                        "            <hr>\n" +
+                        "        </div>\n" +
+                        "\n" +
+                        "        <div class=\"teacherViewDetailAnswers\">\n" +
+                        "            <p><b>Question 4:</b> Lorem ipsum dolor sit amet consectetur adipisicing elit. Ratione voluptates, labore repellat nostrum nemo fuga magnam odio, eius numquam incidunt omnis. Totam deserunt optio ab itaque labore officia quos placeat?(score: 3)</p>\n" +
+                        "            <p><b>Student Answer:</b> Lorem ipsum dolor sit amet consectetur adipisicing elit. Quibusdam nesciunt corporis iste animi molestiae minus nulla eaque, culpa ducimus. Nobis consequuntur earum officia animi dolor iure quidem sed qui omnis?</p>\n" +
+                        "            <b>earned score:</b> <form><input type=\"number\"> <input type=\"submit\" value=\"save grade\"></form>\n" +
+                        "            <hr>\n" +
+                        "        </div>\n" +
+                        "\n" +
+                        "        <div class=\"teacherViewDetailAnswers\">\n" +
+                        "            <p><b>Question 5:</b> Lorem ipsum dolor sit amet consectetur adipisicing elit. Ratione voluptates, labore repellat nostrum nemo fuga magnam odio, eius numquam incidunt omnis. Totam deserunt optio ab itaque labore officia quos placeat?(score: 3)</p>\n" +
+                        "            <p><b>Student Answer:</b> Lorem ipsum dolor sit amet consectetur adipisicing elit. Quibusdam nesciunt corporis iste animi molestiae minus nulla eaque, culpa ducimus. Nobis consequuntur earum officia animi dolor iure quidem sed qui omnis?</p>\n" +
+                        "            <b>earned score:</b> <form><input type=\"number\"> <input type=\"submit\" value=\"save grade\"></form>\n" +
+                        "            <hr>\n" +
+                        "        </div>\n" +
+                        "\n" +
+                        "        <div class=\"teacherViewDetailAnswers\">\n" +
+                        "            <p><b>Question 6:</b> Lorem ipsum dolor sit amet consectetur adipisicing elit. Ratione voluptates, labore repellat nostrum nemo fuga magnam odio, eius numquam incidunt omnis. Totam deserunt optio ab itaque labore officia quos placeat?(score: 3)</p>\n" +
+                        "            <p><b>Student Answer:</b> Lorem ipsum dolor sit amet consectetur adipisicing elit. Quibusdam nesciunt corporis iste animi molestiae minus nulla eaque, culpa ducimus. Nobis consequuntur earum officia animi dolor iure quidem sed qui omnis?</p>\n" +
+                        "            <b>earned score:</b> <form><input type=\"number\"> <input type=\"submit\" value=\"save grade\"></form>\n" +
+                        "            <hr>\n" +
+                        "        </div>\n" +
+                        "\n" +
+                        "        <button id=\"endCorrection\" value=\"\">End Correction</button>\n" +
+                        "\n" +
+                        "    </div>");
+                })
+            })
             $("#editQuestion").click(function () {
                 var questionId = $(this).val();
                 editQuestion(questionId, exam);

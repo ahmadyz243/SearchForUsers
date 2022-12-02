@@ -67,6 +67,7 @@ hr{
     color: aliceblue;
     background-color: green;
     font-size: 170%;
+    width: 90%;
 }
 
 .test{
@@ -75,6 +76,10 @@ hr{
     margin-right: 7px;
     background-color: rgb(240, 221, 7);
     color: black;
+}
+
+.test:hover {
+    background-color: rgb(157, 145, 15);
 }
 
 .examDetails{

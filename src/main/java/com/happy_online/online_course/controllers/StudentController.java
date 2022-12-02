@@ -5,7 +5,6 @@ import com.happy_online.online_course.payload.request.StudentAnswerRequest;
 import com.happy_online.online_course.payload.response.ExamQuestionAnswerResponse;
 import com.happy_online.online_course.payload.response.ExamQuestionResponse;
 import com.happy_online.online_course.payload.response.ExamResponseForView;
-import com.happy_online.online_course.payload.response.StudentAnswersResponse;
 import com.happy_online.online_course.service.CourseService;
 import com.happy_online.online_course.service.ExamQuestionService;
 import com.happy_online.online_course.service.ExamService;
@@ -63,12 +62,6 @@ public class StudentController {
         studentAnswersService.addAnswer(answerRequest);
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
-
-//    @PostMapping("/course/exam/auto-set-grade/{exam_id}}")
-//    public ResponseEntity<?> autoSetGrade(@PathVariable Long exam_id ) {
-//اهههههههههههههههههههههههههههههههههههههههههههههههههههههههههههههههههههههههههههههههههههههههههههههههههههههههههه
-//        return new ResponseEntity<>(HttpStatus.ACCEPTED);
-//    }
 
 
 }

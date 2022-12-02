@@ -136,6 +136,19 @@ public class ExamServiceImpl extends BaseServiceImpl<Exam, Long, ExamRepository>
         addQuestion(detailedQuestion.getExamId(), question, detailedQuestion.getScore());
     }
 
+    @Override
+    public void autoSetGrade(Long exam_id, Long course_id) {
+        Course course = courseService.findById(course_id);
+        List<Exam> exams = repository.findByCourse(course);
+        Exam exam = new Exam();
+        for (Exam value : exams) {
+            if (value.getId().equals(exam_id)) {
+                exam = value;
+            }
+        }
+
+    }
+
 
     private Exam mapCreateReqToExam(ExamCreateRequest examCreateRequest) {
         Exam exam = new Exam();

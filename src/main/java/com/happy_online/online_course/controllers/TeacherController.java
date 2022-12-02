@@ -138,5 +138,10 @@ public class TeacherController {
         ExamQuestionResponse examResponse = examQuestionService.findByIdAndTeacher(id, teacherUsername);
         return new ResponseEntity<>(examResponse, HttpStatus.ACCEPTED);
     }
+    @PostMapping("/course/exam/auto-set-grade/{exam_id}/{course_id}")
+    public ResponseEntity<?> autoSetGrade(@PathVariable Long exam_id, @PathVariable Long course_id) {
+        examService.autoSetGrade(exam_id, course_id);
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+    }
 }
 

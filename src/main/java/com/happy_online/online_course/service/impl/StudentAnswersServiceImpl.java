@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class StudentAnswersServiceImpl extends BaseServiceImpl<StudentAnswers, Long, StudentAnswersRepository> implements StudentAnswersService {
@@ -37,48 +38,45 @@ public class StudentAnswersServiceImpl extends BaseServiceImpl<StudentAnswers, L
         String studentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
         Student student = studentService.findByUsername(studentUsername);
         if (LocalDateTime.now().isBefore(exam.getEndDate())) {
-
-            StudentAnswers answers = repository.findByStudentAndExam(student, exam);
-            if (answers == null) {
-                answers = new StudentAnswers();
-                answers.setStudent(student);
-                answers.setExam(exam);
-            }
+            Optional<StudentAnswers> answers = repository.findByStudentAndExam(student, exam);
+            answers = answers.or(() -> {
+                StudentAnswers studentAnswers1 = new StudentAnswers();
+                studentAnswers1.setStudent(student);
+                studentAnswers1.setExam(exam);
+                return Optional.of(studentAnswers1);
+            });
             List<Integer> integers = new ArrayList<>();
-            if (answers.getExamQuestionAnswerList() != null) {
-                answers.getExamQuestionAnswerList().forEach(answer -> {
-                    if (answer.getExamQuestion().getId() == answerRequest.getExamQuestionId()) {
-                        answer.setAnswer(answerRequest.getAnswer());
-                        integers.add(1);
-                    }
-                });
-            }
+            answers.get().getExamQuestionAnswerList().forEach(answer -> {
+                if (answer.getExamQuestion().getId().equals(answerRequest.getExamQuestionId())) {
+                    answer.setAnswer(answerRequest.getAnswer());
+                    integers.add(1);
+                }
+            });
 
             if (integers.size() == 0) {
                 ExamQuestionAnswer examQuestionAnswer = new ExamQuestionAnswer();
                 examQuestionAnswer.setAnswer(answerRequest.getAnswer());
                 ExamQuestion examQuestion = examQuestionService.findById(answerRequest.getExamQuestionId());
                 examQuestionAnswer.setExamQuestion(examQuestion);
-                examQuestionAnswer.setStudentAnswers(answers);
-                answers.setExamQuestionAnswerList(examQuestionAnswer);
+                examQuestionAnswer.setStudentAnswers(answers.get());
+                answers.get().setExamQuestionAnswerList(examQuestionAnswer);
             }
-            repository.save(answers);
+            repository.save(answers.get());
         } else {
-            StudentAnswers answer = repository.findByStudentAndExam(student, exam);
-            answer.setFinalized(true);
+            Optional<StudentAnswers> answer = repository.findByStudentAndExam(student, exam);
+            answer.ifPresent(studentAnswers -> studentAnswers.setFinalized(true));
         }
-
     }
 
     @Override
     public List<ExamQuestionAnswerResponse> findStudentAnswers(Long exam_id) {
+        List<ExamQuestionAnswerResponse> examQuestionAnswerResponses = new ArrayList<>();
         String studentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
         Student student = studentService.findByUsername(studentUsername);
         Exam exam = examService.findById(exam_id);
-        StudentAnswers studentAnswers = repository.findByStudentAndExam(student, exam);
-        List<ExamQuestionAnswerResponse> examQuestionAnswerResponses = new ArrayList<>();
-        if (studentAnswers.getExamQuestionAnswerList() != null) {
-            studentAnswers.getExamQuestionAnswerList().forEach(answer -> {
+        Optional<StudentAnswers> studentAnswers = repository.findByStudentAndExam(student, exam);
+        if (studentAnswers.isPresent()) {
+            studentAnswers.get().getExamQuestionAnswerList().forEach(answer -> {
                 ExamQuestionAnswerResponse examQuestionAnswerResponse = new ExamQuestionAnswerResponse();
                 examQuestionAnswerResponse.setAnswer(answer.getAnswer());
                 examQuestionAnswerResponse.setExamQuestionId(answer.getExamQuestion().getQuestion().getId());
@@ -86,6 +84,6 @@ public class StudentAnswersServiceImpl extends BaseServiceImpl<StudentAnswers, L
             });
             return examQuestionAnswerResponses;
         }
-        return null;
+        return examQuestionAnswerResponses;
     }
 }

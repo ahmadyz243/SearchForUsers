@@ -1,4 +1,5 @@
 $(document).ready(function () {
+        var examQuestionIdForGoingNextAndBack = 0;
         var studentRequests = [];
         var masterRequests = [];
         var studentSignUpRequest = "";
@@ -150,6 +151,7 @@ $(document).ready(function () {
             viewExamQuestion(allQuestions, exam, 0, allAnswers, questionList);
         }
 
+
         function createAllQuestions(questionList, allAnswers) {
             var allQuestions = [];
             var answer = "";
@@ -182,8 +184,10 @@ $(document).ready(function () {
                             answer = allAnswers[j].answer;
                         }
                     }
+
                     question = " <p><b>" + (i + 1) + ". " + questionList[i].question.question + "(score: " + questionList[i].score + ")</b> </p>\n" +
-                        "<textarea  class=\"detailQuestionAnswers\" placeholder=\"write your answer here\">" + answer + "</textarea>\n";
+                        "<textarea name=''  class=\"detailQuestionAnswers\" placeholder=\"write your answer here\">" + answer + "</textarea>\n" +
+                        "<button class='hidenHelper' value='" + questionList[i].examQuestionId + "' ></button>";
                 }
                 allQuestions.push(question);
                 question = "";
@@ -192,6 +196,7 @@ $(document).ready(function () {
         }
 
         function viewExamQuestion(questions, exam, count, allAnswers, questionList) {
+            var examQuestionId = null;
             $("article").html(" <div id=\"examination\">\n" +
                 "            <h2 id=\"timeRemaining\">time remaining</h2>\n" +
                 questions[count] +
@@ -202,6 +207,7 @@ $(document).ready(function () {
                 "</div>\n" +
                 "</div>"
             )
+            $(".hidenHelper").hide();
             var min = exam.time;
             var second = 0;
             var x = setInterval(function () {
@@ -227,32 +233,97 @@ $(document).ready(function () {
             $(".next").click(function () {
                 var questionAnswer = "";
                 var questionAnswers = [];
+                var examQuestionId = "";
+                examQuestionId = $(".hidenHelper").val();
+                console.log(examQuestionId);
                 if (count < questions.length - 1) {
                     questionAnswer = $(".detailQuestionAnswers").val();
-                    if (questionAnswer === "" || questionAnswer === null || questionAnswer === undefined) {
+                    if (examQuestionId !== undefined) {
+                        console.log("im detailed question");
+                        studentAnswerReq.exam_id = exam.id;
+                        studentAnswerReq.examQuestionId = parseInt(examQuestionId);
+                        studentAnswerReq.answer = questionAnswer;
+                    } else if (questionAnswer === "" || questionAnswer === null || questionAnswer === undefined) {
                         questionAnswer = $('input[name="item"]:checked').val();
-                        questionAnswers = questionAnswer.split("-");
-                    }
-                    studentAnswerReq.answer = questionAnswers[1];
-                    studentAnswerReq.examQuestionId = questionAnswers[0];
-                    studentAnswerReq.exam_id = exam.id;
-                    console.log(studentAnswerReq);
-                    console.log(studentAnswerReq.examQuestionId);
-                    for (let i = 0; i < allAnswers.length; i++) {
-                        if (allAnswers[i].examQuestionId == studentAnswerReq.examQuestionId) {
-                            allAnswers[i].answer = studentAnswerReq.answer;
-                            console.log("hi");
+                        if (questionAnswer === "" || questionAnswer === undefined || questionAnswer === null) {
+                            alert("answer the question first!")
                         }
+                        console.log("im multy")
+                        questionAnswers = questionAnswer.split("-");
+                        studentAnswerReq.answer = questionAnswers[1];
+                        studentAnswerReq.examQuestionId = parseInt(questionAnswers[0]);
+                        studentAnswerReq.exam_id = exam.id;
+                    }
+
+                    var flag = false;
+                    for (let i = 0; i < allAnswers.length; i++) {
+                        console.log("im updating...");
+                        if (allAnswers[i].examQuestionId ===parseInt(studentAnswerReq.examQuestionId)) {
+                            console.log("updated...");
+                            allAnswers[i].answer = studentAnswerReq.answer;
+                            flag = true;
+                        }
+                    }
+                    if (flag === false) {
+                        console.log("im adding...");
+                        var newAnswer = {
+                            answer: studentAnswerReq.answer,
+                            examQuestionId: studentAnswerReq.examQuestionId
+                        }
+                        allAnswers.push(newAnswer);
+                        flag = false;
                     }
                     console.log(allAnswers);
                     setAnswerForStudent(studentAnswerReq)
                     count++;
-                    console.log(questions[count - 1]);
                     viewExamQuestion(createAllQuestions(questionList, allAnswers), exam, count, allAnswers, questionList);
                 }
             })
             $(".previous").click(function () {
+                var questionAnswer = "";
+                var questionAnswers = [];
+                var examQuestionId = "";
+                examQuestionId = $(".hidenHelper").val();
+                console.log(examQuestionId);
                 if (count !== 0) {
+                    questionAnswer = $(".detailQuestionAnswers").val();
+                    if (examQuestionId !== undefined) {
+                        console.log("im detailed question");
+                        studentAnswerReq.exam_id = exam.id;
+                        studentAnswerReq.examQuestionId = parseInt(examQuestionId);
+                        studentAnswerReq.answer = questionAnswer;
+                    } else if (questionAnswer === "" || questionAnswer === null || questionAnswer === undefined) {
+                        questionAnswer = $('input[name="item"]:checked').val();
+                        if (questionAnswer === "" || questionAnswer === undefined || questionAnswer === null) {
+                            alert("answer the question first!")
+                        }
+                        console.log("im multy");
+                        questionAnswers = questionAnswer.split("-");
+                        studentAnswerReq.answer = questionAnswers[1];
+                        studentAnswerReq.examQuestionId = parseInt(questionAnswers[0]);
+                        studentAnswerReq.exam_id = exam.id;
+                    }
+
+                    var flag = false;
+                    for (let i = 0; i < allAnswers.length; i++) {
+                        if (allAnswers[i].examQuestionId === studentAnswerReq.examQuestionId) {
+                            console.log("im updating");
+                            allAnswers[i].answer = studentAnswerReq.answer;
+                            flag = true;
+                        }
+                    }
+                    if (flag === false) {
+                        console.log("im adding");
+                        var newAnswer = {
+                            answer: studentAnswerReq.answer,
+                            examQuestionId: studentAnswerReq.examQuestionId
+                        }
+                        allAnswers.push(newAnswer);
+                        flag = false;
+                    }
+                    console.log(allAnswers);
+
+                    setAnswerForStudent(studentAnswerReq)
                     count--;
                     viewExamQuestion(createAllQuestions(questionList, allAnswers), exam, count, allAnswers, questionList);
                 }
@@ -558,7 +629,7 @@ $(document).ready(function () {
                 deleteExam(examId);
                 $("article").html("");
             })
-            $("#viewStudentsResponses").click(function (){
+            $("#viewStudentsResponses").click(function () {
                 $("article").html("<div id=\"teacherViewStudentsAnswers\">\n" +
 
                     "        <div class=\"studentsAnswers\">\n" +
@@ -572,7 +643,7 @@ $(document).ready(function () {
                     "        </div>\n" +
 
                     "    </div>");
-                $(".studentsAnswers").click(function (){
+                $(".studentsAnswers").click(function () {
                     $("article").html("<div id=\"teacherViewStudentAnswers\">\n" +
                         "        <h2>Ahmad Yazdi</h2>\n" +
                         "\n" +

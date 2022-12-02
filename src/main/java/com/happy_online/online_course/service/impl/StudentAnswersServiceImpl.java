@@ -1,8 +1,10 @@
 package com.happy_online.online_course.service.impl;
 
+import com.happy_online.online_course.mapper.ExamQuestionMapper;
 import com.happy_online.online_course.models.*;
 import com.happy_online.online_course.payload.request.StudentAnswerRequest;
 import com.happy_online.online_course.payload.response.ExamQuestionAnswerResponse;
+import com.happy_online.online_course.payload.response.ExamQuestionResponse;
 import com.happy_online.online_course.repository.StudentAnswersRepository;
 import com.happy_online.online_course.service.ExamQuestionService;
 import com.happy_online.online_course.service.ExamService;
@@ -91,5 +93,81 @@ public class StudentAnswersServiceImpl extends BaseServiceImpl<StudentAnswers, L
             return examQuestionAnswerResponses;
         }
         return examQuestionAnswerResponses;
+    }
+
+    @Override
+    @Transactional
+    public void addAllAnswers(List<StudentAnswerRequest> studentAnswerRequests, Long exam_id) {
+        Student student = studentService.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+        Exam exam = examService.findById(exam_id);
+        Optional<StudentAnswers> studentAnswers = repository.findByStudentAndExam(student, exam);
+
+        studentAnswers = studentAnswers.or(() -> {
+            StudentGrade studentGrade = new StudentGrade();
+            StudentAnswers studentAnswers1 = new StudentAnswers();
+            studentAnswers1.setStudent(student);
+            studentAnswers1.setExam(exam);
+            studentGrade.setStudent(student);
+            studentGrade.setExam(exam);
+            studentAnswers1.setGrade(studentGrade);
+            studentGrade.setStudentAnswers(studentAnswers1);
+            return Optional.of(studentAnswers1);
+        });
+
+        //all questions for check the answers
+        List<ExamQuestion> examQuestions = exam.getExamQuestionList();
+
+        //These are all the answers came from UI
+        List<ExamQuestionAnswer> examQuestionAnswerList = new ArrayList<>();
+
+        //this is the last answers of student
+        List<ExamQuestionAnswer> studentExamQuestionAnswers = studentAnswers.get().getExamQuestionAnswerList();
+
+        Optional<StudentAnswers> finalStudentAnswers = studentAnswers;
+        examQuestions.forEach(examQuestion -> {
+            studentAnswerRequests.forEach(studentAnswer -> {
+                if (studentAnswer.getExamQuestionId().equals(examQuestion.getId())) {
+                    ExamQuestionAnswer examQuestionAnswer = new ExamQuestionAnswer();
+                    examQuestionAnswer.setStudentAnswers(finalStudentAnswers.get());
+                    examQuestionAnswer.setExamQuestion(examQuestion);
+                    examQuestionAnswer.setAnswer(studentAnswer.getAnswer());
+                    examQuestionAnswerList.add(examQuestionAnswer);
+                }
+            });
+        });
+        studentExamQuestionAnswers.forEach(allStudentAnswers -> {
+            examQuestionAnswerList.forEach(uiAnswers -> {
+                if (allStudentAnswers.getExamQuestion().equals(uiAnswers.getExamQuestion())) {
+                    allStudentAnswers.setAnswer(uiAnswers.getAnswer());
+                }
+            });
+        });
+        studentAnswers.get().setExamQuestionAnswerList(studentExamQuestionAnswers);
+        studentAnswers.get().setFinalized(true);
+        repository.save(studentAnswers.get());
+    }
+
+    @Override
+    @Transactional
+    public Boolean checkForEnd(Long exam_id, String username) {
+        Student student = studentService.findByUsername(username);
+        Exam exam = examService.findById(exam_id);
+        Optional<StudentAnswers> studentAnswers = repository.findByStudentAndExam(student, exam);
+
+        studentAnswers = studentAnswers.or(() -> {
+            StudentGrade studentGrade = new StudentGrade();
+            StudentAnswers studentAnswers1 = new StudentAnswers();
+            studentAnswers1.setStudent(student);
+            studentAnswers1.setExam(exam);
+            studentGrade.setStudent(student);
+            studentGrade.setExam(exam);
+            studentAnswers1.setGrade(studentGrade);
+            studentGrade.setStudentAnswers(studentAnswers1);
+            return Optional.of(studentAnswers1);
+        });
+        if (studentAnswers.isPresent()) {
+            return studentAnswers.get().getFinalized();
+        }
+        return true;
     }
 }

@@ -83,6 +83,7 @@ hr{
     font-size: large;
     border: 0;
     margin-top: 15px;
+    text-align: center;
 }
 
 .questions{
@@ -91,6 +92,7 @@ hr{
     align-items: center;
     padding-left: 15px;
     margin-top: 35px;
+    width: 99%;
 }
 
 .question{
@@ -138,6 +140,22 @@ hr{
 
 .teacherViewDetailAnswers input[type=number]{
     width: 25%;
+}
+
+.studentsAnswers{
+    width: 95%;
+    background-color: rgb(63, 0, 222);
+    height: 40px;
+    color: aliceblue;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 115%;
+    margin-bottom: 7px;
+}
+
+.studentsAnswers:hover {
+    background-color: rgb(10, 0, 62);
 }
 
 #addTestButton{
@@ -223,6 +241,13 @@ hr{
     margin-top: 5px;
 }
 
+#viewStudentsResponses{
+    background-color: rgb(18, 210, 136);
+    width: 20%;
+    height: 30px;
+    margin-top: 5px;
+}
+
 #addNewDetailedQuestion{
     margin-bottom: 60px;
 }
@@ -292,6 +317,13 @@ hr{
     background-color: rgb(140, 19, 19);
 }
 
+#teacherViewStudentsAnswers{
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 #teacherViewStudentAnswers{
     width: 100%;
     height: 1000px;
@@ -312,5 +344,6 @@ hr{
     text-align: center;
     color: black;
 }
+
 
 

@@ -1,10 +1,7 @@
 package com.happy_online.online_course.service.impl;
 
 import com.happy_online.online_course.mapper.ExamMapper;
-import com.happy_online.online_course.models.Course;
-import com.happy_online.online_course.models.Exam;
-import com.happy_online.online_course.models.ExamQuestion;
-import com.happy_online.online_course.models.Question;
+import com.happy_online.online_course.models.*;
 import com.happy_online.online_course.payload.request.DetailedQuestionDTO;
 import com.happy_online.online_course.payload.request.ExamCreateRequest;
 import com.happy_online.online_course.payload.request.ExamQuestionInfo;
@@ -21,10 +18,12 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.Inheritance;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class ExamServiceImpl extends BaseServiceImpl<Exam, Long, ExamRepository> implements ExamService {
@@ -45,6 +44,7 @@ public class ExamServiceImpl extends BaseServiceImpl<Exam, Long, ExamRepository>
     public Exam saveExam(ExamCreateRequest examCreateRequest) {
         Course course = courseService.findById(examCreateRequest.getCourseId());
         Exam exam = mapCreateReqToExam(examCreateRequest);
+
         exam.setCourse(course);
         exam.setEndDate(exam.getStartDateAndTime().plusMinutes(exam.getTime()));
         return repository.save(exam);
@@ -137,14 +137,49 @@ public class ExamServiceImpl extends BaseServiceImpl<Exam, Long, ExamRepository>
     }
 
     @Override
+    @Transactional
     public void autoSetGrade(Long exam_id, Long course_id) {
         Course course = courseService.findById(course_id);
         List<Exam> exams = repository.findByCourse(course);
         Exam exam = new Exam();
-        for (Exam value : exams) {
-            if (value.getId().equals(exam_id)) {
-                exam = value;
+        for (int i = 0; i < course.getExamList().size(); i++) {
+            if (exam_id.equals(course.getExamList().get(i).getId())) {
+                exam = course.getExamList().get(i);
+                break;
             }
+        }
+        if (exam.getEndDate().isAfter(LocalDateTime.now())) {
+            List<Student> students = course.getStudentList();
+            List<StudentAnswers> studentsAnswers = exam.getStudentAnswers();
+            Exam finalExam = exam;
+            students.forEach(student -> {
+                studentsAnswers.forEach(studentAnswers -> {
+                    if (student == studentAnswers.getStudent()) {
+                        studentAnswers.getExamQuestionAnswerList().forEach(studentAnswer -> {
+                            MultipleChoiceQuestion multipleChoiceQuestion = (MultipleChoiceQuestion) studentAnswer.getExamQuestion().getQuestion();
+                            if (multipleChoiceQuestion.getQuestionItemList() != null) {
+                                multipleChoiceQuestion.getQuestionItemList().forEach(questionItem -> {
+                                    if (questionItem.getIsRightAnswer()) {
+                                        String correctAnswer = questionItem.getAnswer();
+                                        if (studentAnswer.getAnswer().equals(correctAnswer)) {
+                                            student.getStudentGrades().forEach(grade -> {
+                                                if (grade.getExam() == finalExam) {
+                                                    if (!grade.getIsAutoSet()) {
+                                                        grade.setScore(studentAnswer.getExamQuestion().getScore());
+                                                    }
+                                                    grade.setIsAutoSet(true);
+                                                }
+                                            });
+                                        }
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+            });
+        } else {
+            throw new BadCredentialsException("you can just set the scores after the exam!");
         }
 
     }

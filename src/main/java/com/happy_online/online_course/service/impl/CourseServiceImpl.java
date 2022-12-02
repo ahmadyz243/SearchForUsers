@@ -2,10 +2,7 @@ package com.happy_online.online_course.service.impl;
 
 import com.happy_online.online_course.exception.NotFoundException;
 import com.happy_online.online_course.mapper.CourseMapper;
-import com.happy_online.online_course.models.Course;
-import com.happy_online.online_course.models.Exam;
-import com.happy_online.online_course.models.Student;
-import com.happy_online.online_course.models.Teacher;
+import com.happy_online.online_course.models.*;
 import com.happy_online.online_course.payload.CourseInfoResponseForStudent;
 import com.happy_online.online_course.payload.request.CreateCourseRequest;
 import com.happy_online.online_course.payload.response.CourseInfoResponse;

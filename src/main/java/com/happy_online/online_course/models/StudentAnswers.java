@@ -22,8 +22,8 @@ public class StudentAnswers extends BaseDomain<Long> {
     private Student student;
     @OneToMany(mappedBy = "studentAnswers", cascade = CascadeType.ALL)
     private List<ExamQuestionAnswer> examQuestionAnswerList = new ArrayList<>();
-    @OneToOne(mappedBy = "studentAnswers")
-    private StudentGrade grade;
+    @OneToOne(mappedBy = "studentAnswers", cascade = CascadeType.ALL)
+    private StudentGrade grade = new StudentGrade();
     private Boolean finalized = false;
 
     public void setExamQuestionAnswerList(ExamQuestionAnswer examQuestionAnswer) {

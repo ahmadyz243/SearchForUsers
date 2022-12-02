@@ -32,4 +32,8 @@ public class StudentAnswers extends BaseDomain<Long> {
         }
         this.examQuestionAnswerList.add(examQuestionAnswer);
     }
+
+    public void setExamQuestionAnswerList(List<ExamQuestionAnswer> examQuestionAnswer) {
+        this.examQuestionAnswerList = examQuestionAnswer;
+    }
 }

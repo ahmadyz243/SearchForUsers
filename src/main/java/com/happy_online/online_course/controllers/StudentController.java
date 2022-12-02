@@ -63,11 +63,17 @@ public class StudentController {
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
-    @PostMapping("/course/exam/finish")
-    public ResponseEntity<?> finishExam() {
-
+    @PostMapping("/course/exam/finish/{exam_id}")
+    public ResponseEntity<?> finishExam(@PathVariable Long exam_id, @RequestBody List<StudentAnswerRequest> studentAnswerRequests) {
+        studentAnswersService.addAllAnswers(studentAnswerRequests, exam_id);
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
+    @GetMapping("/course/exam/check-for-end/{exam_id}")
+    public ResponseEntity<Boolean> checkForEnd(@PathVariable Long exam_id) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        Boolean check = studentAnswersService.checkForEnd(exam_id, username);
+        return new ResponseEntity<>(check, HttpStatus.ACCEPTED);
+    }
 
 }

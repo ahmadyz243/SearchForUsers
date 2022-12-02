@@ -62,6 +62,23 @@ $(document).ready(function () {
             })
         })
 
+        function checkForEnd(examId) {
+            var check = true;
+            $.ajax({
+                url: "/api/student/course/exam/check-for-end/" + examId,
+                method: "GET",
+                async: false,
+                contentType: "application/json",
+                success: function (response) {
+                    check = response;
+                },
+                error: function (erorMessage) {
+                    console.log(erorMessage);
+                }
+            })
+            return check;
+        }
+
         function viewStudentCourse(course) {
             var viewStudentCourseCode = " <table>\n" +
                 "        <caption><b>My Exams</b></caption>\n" +
@@ -76,8 +93,11 @@ $(document).ready(function () {
                 "        </tr>\n";
             for (let i = 0; i < course.examList.length; i++) {
                 var status = "";
-                if (course.examList[i].enabled === true) {
-                    status = "          <td><button value=\"" + course.examList[i].id + "\" class=\"startExam\">start exam</button></td>\n"
+                var check = checkForEnd(course.examList[i].id);
+                if (check) {
+                    status = "<td> you joined! </td>";
+                } else if (course.examList[i].enabled === true) {
+                    status = "<td><button value=\"" + course.examList[i].id + "\" class=\"startExam\">start exam</button></td>\n"
                 } else {
                     status = "<td> not available </td>";
                 }
@@ -103,8 +123,6 @@ $(document).ready(function () {
                         break;
                     }
                 }
-                console.log(course);
-                console.log(exam);
                 startExam(questionList, exam);
             })
         }
@@ -208,28 +226,91 @@ $(document).ready(function () {
                 "</div>"
             )
             $(".hidenHelper").hide();
-            var min = exam.time;
-            var second = 0;
+            var finishDate = new Date(exam.endDate).getTime();
+            // var min = exam.time;
+            // var second = 0;
             var x = setInterval(function () {
-                if (second <= 0) {
-                    if (min > 0) {
-                        min--;
-                        exam.time = exam.time - 1;
-                        second += 60;
-                    } else {
-                        clearInterval(x);
+                var now = new Date().getTime();
+                var distance = finishDate - now;
+                var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                $("#timeRemaining").html(hours + " hours & " + minutes + " min & " + seconds + " seconds");
+                if (distance < 0) {
+                    clearInterval(x);
+
+                    var questionAnswer = "";
+                    var questionAnswers = [];
+                    var examQuestionId = "";
+                    examQuestionId = $(".hidenHelper").val();
+                    questionAnswer = $(".detailQuestionAnswers").val();
+                    if (examQuestionId !== undefined) {
+                        console.log("im detailed question");
+                        studentAnswerReq.exam_id = exam.id;
+                        studentAnswerReq.examQuestionId = parseInt(examQuestionId);
+                        studentAnswerReq.answer = questionAnswer;
+                    } else if (questionAnswer === "" || questionAnswer === null || questionAnswer === undefined) {
+                        questionAnswer = $('input[name="item"]:checked').val();
+                        if (questionAnswer === "" || questionAnswer === undefined || questionAnswer === null) {
+                            alert("answer the question first!")
+                        }
+                        questionAnswers = questionAnswer.split("-");
+                        studentAnswerReq.answer = questionAnswers[1];
+                        studentAnswerReq.examQuestionId = parseInt(questionAnswers[0]);
+                        studentAnswerReq.exam_id = exam.id;
                     }
-                } else {
-                    second--;
-                    $("#timeRemaining").html(min + " min & " + second + " seconds");
+                    var flag = false;
+                    for (let i = 0; i < allAnswers.length; i++) {
+                        if (allAnswers[i].examQuestionId === studentAnswerReq.examQuestionId) {
+                            console.log("im updating");
+                            allAnswers[i].answer = studentAnswerReq.answer;
+                            flag = true;
+                        }
+                    }
+                    if (flag === false) {
+                        var newAnswer = {
+                            answer: studentAnswerReq.answer,
+                            examQuestionId: studentAnswerReq.examQuestionId
+                        }
+                        allAnswers.push(newAnswer);
+                        flag = false;
+                    }
+                    console.log(allAnswers);
+                    setAnswerForStudent(studentAnswerReq)
+                    $.ajax({
+                        url: "/api/student/course/exam/finish/" + exam.id,
+                        method: "POST",
+                        data: JSON.stringify(allAnswers),
+                        contentType: "application/json",
+                        success: function (response) {
+                            alert("good luck!")
+                        },
+                        error: function (erorMessage) {
+                            console.log(erorMessage);
+                        }
+                    })
+                    setArticleNull();
                 }
             }, 1000);
+            //     if (second <= 0) {
+            //         if (min > 0) {
+            //             min--;
+            //             exam.time = exam.time - 1;
+            //             second += 60;
+            //         } else {
+            //             clearInterval(x);
+            //         }
+            //     } else {
+            //         second--;
+
+            //     }
+
             var studentAnswerReq = {
                 answer: "",
                 examQuestionId: null,
                 exam_id: null
             }
-
             $(".next").click(function () {
                 var questionAnswer = "";
                 var questionAnswers = [];
@@ -258,7 +339,7 @@ $(document).ready(function () {
                     var flag = false;
                     for (let i = 0; i < allAnswers.length; i++) {
                         console.log("im updating...");
-                        if (allAnswers[i].examQuestionId ===parseInt(studentAnswerReq.examQuestionId)) {
+                        if (allAnswers[i].examQuestionId === parseInt(studentAnswerReq.examQuestionId)) {
                             console.log("updated...");
                             allAnswers[i].answer = studentAnswerReq.answer;
                             flag = true;
@@ -328,6 +409,63 @@ $(document).ready(function () {
                     viewExamQuestion(createAllQuestions(questionList, allAnswers), exam, count, allAnswers, questionList);
                 }
             })
+            $(".finish").click(function () {
+                var questionAnswer = "";
+                var questionAnswers = [];
+                var examQuestionId = "";
+                examQuestionId = $(".hidenHelper").val();
+                questionAnswer = $(".detailQuestionAnswers").val();
+                if (examQuestionId !== undefined) {
+                    console.log("im detailed question");
+                    studentAnswerReq.exam_id = exam.id;
+                    studentAnswerReq.examQuestionId = parseInt(examQuestionId);
+                    studentAnswerReq.answer = questionAnswer;
+                } else if (questionAnswer === "" || questionAnswer === null || questionAnswer === undefined) {
+                    questionAnswer = $('input[name="item"]:checked').val();
+                    if (questionAnswer === "" || questionAnswer === undefined || questionAnswer === null) {
+                        alert("answer the question first!")
+                    }
+                    questionAnswers = questionAnswer.split("-");
+                    studentAnswerReq.answer = questionAnswers[1];
+                    studentAnswerReq.examQuestionId = parseInt(questionAnswers[0]);
+                    studentAnswerReq.exam_id = exam.id;
+                }
+                var flag = false;
+                for (let i = 0; i < allAnswers.length; i++) {
+                    if (allAnswers[i].examQuestionId === studentAnswerReq.examQuestionId) {
+                        console.log("im updating");
+                        allAnswers[i].answer = studentAnswerReq.answer;
+                        flag = true;
+                    }
+                }
+                if (flag === false) {
+                    var newAnswer = {
+                        answer: studentAnswerReq.answer,
+                        examQuestionId: studentAnswerReq.examQuestionId
+                    }
+                    allAnswers.push(newAnswer);
+                    flag = false;
+                }
+                console.log(allAnswers);
+                setAnswerForStudent(studentAnswerReq)
+                $.ajax({
+                    url: "/api/student/course/exam/finish/" + exam.id,
+                    method: "POST",
+                    data: JSON.stringify(allAnswers),
+                    contentType: "application/json",
+                    success: function (response) {
+                        alert("good luck!")
+                    },
+                    error: function (erorMessage) {
+                        console.log(erorMessage);
+                    }
+                })
+                setArticleNull();
+            })
+        }
+
+        function setArticleNull() {
+            $("article").html("");
         }
 
         function setAnswerForStudent(studentAnswerReq) {
@@ -363,8 +501,8 @@ $(document).ready(function () {
         }
 
 
-        // MASTER ---------------------------------------------------------------------------
-        //GET TEACHER COURSES LIST
+// MASTER ---------------------------------------------------------------------------
+//GET TEACHER COURSES LIST
         $("#viewTeacherCourses").click(function () {
             var teacherCourses = getTeacherCourses();
             console.log(teacherCourses);
@@ -1048,7 +1186,7 @@ $(document).ready(function () {
             return teacherCourses;
         }
 
-        //SIGNUP---------------------------------------------------------
+//SIGNUP---------------------------------------------------------
         $("#signup").click(function (event) {
             event.preventDefault();
             var name = $('input[name="name"]').val();
@@ -1081,9 +1219,9 @@ $(document).ready(function () {
                 }
             })
         })
-        //ADMIN ------------------------------------------------------------------------------------------------
+//ADMIN ------------------------------------------------------------------------------------------------
 
-        //view signup requests
+//view signup requests
         $("#viewSignupRequests").click(function () {
             viewSignUpRequest();
         })
@@ -1183,7 +1321,7 @@ $(document).ready(function () {
             })
         }
 
-        //Add new Course-------------------------------------
+//Add new Course-------------------------------------
 
         $("#addNewCourse").click(function () {
             getMasters();
@@ -1498,7 +1636,7 @@ $(document).ready(function () {
             }
 
         })
-        // LOGOUT----------------------------------------------------------------------------
+// LOGOUT----------------------------------------------------------------------------
         $("#logout").click(function () {
             $.ajax({
                 url: "/api/auth/signout",

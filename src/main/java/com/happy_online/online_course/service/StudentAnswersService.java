@@ -11,4 +11,8 @@ public interface StudentAnswersService extends BaseService<StudentAnswers, Long>
     void addAnswer(StudentAnswerRequest answerRequest);
 
     List<ExamQuestionAnswerResponse> findStudentAnswers(Long exam_id);
+
+    void addAllAnswers(List<StudentAnswerRequest> studentAnswerRequests, Long exam_id);
+
+    Boolean checkForEnd(Long exam_id, String username);
 }

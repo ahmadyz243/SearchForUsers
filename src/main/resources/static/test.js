@@ -1,5 +1,5 @@
 $(document).ready(function () {
-        var examQuestionIdForGoingNextAndBack = 0;
+        var allExamQuestionId = [];
         var studentRequests = [];
         var masterRequests = [];
         var studentSignUpRequest = "";
@@ -171,12 +171,15 @@ $(document).ready(function () {
 
 
         function createAllQuestions(questionList, allAnswers) {
-            var allQuestions = [];
+            allExamQuestionId = [];
+            allQuestions = [];
             var answer = "";
             var question = "";
             var items = "";
             for (let i = 0; i < questionList.length; i++) {
+                allExamQuestionId.push(questionList[i].examQuestionId);
                 if (questionList[i].question.questionItemList !== null) {
+                    allExamQuestionId.push(questionList[i].examQuestionId);
                     items = "<div class=\"multipleQuestionOptions\">\n";
                     answer = "";
                     for (let j = 0; j < allAnswers.length; j++) {
@@ -210,6 +213,7 @@ $(document).ready(function () {
                 allQuestions.push(question);
                 question = "";
             }
+
             return allQuestions;
         }
 
@@ -252,12 +256,18 @@ $(document).ready(function () {
                         studentAnswerReq.answer = questionAnswer;
                     } else if (questionAnswer === "" || questionAnswer === null || questionAnswer === undefined) {
                         questionAnswer = $('input[name="item"]:checked').val();
-                        if (questionAnswer === "" || questionAnswer === undefined || questionAnswer === null) {
-                            alert("answer the question first!")
+                        // if (questionAnswer === "" || questionAnswer === undefined || questionAnswer === null) {
+                        //     alert("answer the question first!")
+                        // }
+                        if (questionAnswer !== undefined) {
+                            questionAnswers = questionAnswer.split("-");
+                            studentAnswerReq.answer = questionAnswers[1];
+                            studentAnswerReq.examQuestionId = parseInt(questionAnswers[0]);
+                        } else {
+
+                            studentAnswerReq.examQuestionId = allExamQuestionId[count];
+                            studentAnswerReq.answer = "  ";
                         }
-                        questionAnswers = questionAnswer.split("-");
-                        studentAnswerReq.answer = questionAnswers[1];
-                        studentAnswerReq.examQuestionId = parseInt(questionAnswers[0]);
                         studentAnswerReq.exam_id = exam.id;
                     }
                     var flag = false;
@@ -318,6 +328,7 @@ $(document).ready(function () {
                 examQuestionId = $(".hidenHelper").val();
                 console.log(examQuestionId);
                 if (count < questions.length - 1) {
+                    count++;
                     questionAnswer = $(".detailQuestionAnswers").val();
                     if (examQuestionId !== undefined) {
                         console.log("im detailed question");
@@ -326,13 +337,17 @@ $(document).ready(function () {
                         studentAnswerReq.answer = questionAnswer;
                     } else if (questionAnswer === "" || questionAnswer === null || questionAnswer === undefined) {
                         questionAnswer = $('input[name="item"]:checked').val();
-                        if (questionAnswer === "" || questionAnswer === undefined || questionAnswer === null) {
-                            alert("answer the question first!")
+                        // if (questionAnswer === "" || questionAnswer === undefined || questionAnswer === null) {
+                        //     alert("answer the question first!")
+                        // }
+                        if (questionAnswer !== undefined) {
+                            questionAnswers = questionAnswer.split("-");
+                            studentAnswerReq.answer = questionAnswers[1];
+                            studentAnswerReq.examQuestionId = parseInt(questionAnswers[0]);
+                        } else {
+                            studentAnswerReq.examQuestionId = allExamQuestionId[count];
+                            studentAnswerReq.answer = "  ";
                         }
-                        console.log("im multy")
-                        questionAnswers = questionAnswer.split("-");
-                        studentAnswerReq.answer = questionAnswers[1];
-                        studentAnswerReq.examQuestionId = parseInt(questionAnswers[0]);
                         studentAnswerReq.exam_id = exam.id;
                     }
 
@@ -356,7 +371,6 @@ $(document).ready(function () {
                     }
                     console.log(allAnswers);
                     setAnswerForStudent(studentAnswerReq)
-                    count++;
                     viewExamQuestion(createAllQuestions(questionList, allAnswers), exam, count, allAnswers, questionList);
                 }
             })
@@ -367,6 +381,7 @@ $(document).ready(function () {
                 examQuestionId = $(".hidenHelper").val();
                 console.log(examQuestionId);
                 if (count !== 0) {
+                    count--;
                     questionAnswer = $(".detailQuestionAnswers").val();
                     if (examQuestionId !== undefined) {
                         console.log("im detailed question");
@@ -375,13 +390,18 @@ $(document).ready(function () {
                         studentAnswerReq.answer = questionAnswer;
                     } else if (questionAnswer === "" || questionAnswer === null || questionAnswer === undefined) {
                         questionAnswer = $('input[name="item"]:checked').val();
-                        if (questionAnswer === "" || questionAnswer === undefined || questionAnswer === null) {
-                            alert("answer the question first!")
-                        }
+                        // if (questionAnswer === "" || questionAnswer === undefined || questionAnswer === null) {
+                        //     alert("answer the question first!")
+                        // }
                         console.log("im multy");
-                        questionAnswers = questionAnswer.split("-");
-                        studentAnswerReq.answer = questionAnswers[1];
-                        studentAnswerReq.examQuestionId = parseInt(questionAnswers[0]);
+                        if (questionAnswer !== undefined) {
+                            questionAnswers = questionAnswer.split("-");
+                            studentAnswerReq.answer = questionAnswers[1];
+                            studentAnswerReq.examQuestionId = parseInt(questionAnswers[0]);
+                        } else {
+                            studentAnswerReq.examQuestionId = allExamQuestionId[count];
+                            studentAnswerReq.answer = "  ";
+                        }
                         studentAnswerReq.exam_id = exam.id;
                     }
 
@@ -405,7 +425,6 @@ $(document).ready(function () {
                     console.log(allAnswers);
 
                     setAnswerForStudent(studentAnswerReq)
-                    count--;
                     viewExamQuestion(createAllQuestions(questionList, allAnswers), exam, count, allAnswers, questionList);
                 }
             })
@@ -422,12 +441,17 @@ $(document).ready(function () {
                     studentAnswerReq.answer = questionAnswer;
                 } else if (questionAnswer === "" || questionAnswer === null || questionAnswer === undefined) {
                     questionAnswer = $('input[name="item"]:checked').val();
-                    if (questionAnswer === "" || questionAnswer === undefined || questionAnswer === null) {
-                        alert("answer the question first!")
+                    // if (questionAnswer === "" || questionAnswer === undefined || questionAnswer === null) {
+                    //     alert("answer the question first!")
+                    // }
+                    if (questionAnswer !== undefined) {
+                        questionAnswers = questionAnswer.split("-");
+                        studentAnswerReq.answer = questionAnswers[1];
+                        studentAnswerReq.examQuestionId = parseInt(questionAnswers[0]);
+                    } else {
+                        studentAnswerReq.examQuestionId = allExamQuestionId[count];
+                        studentAnswerReq.answer = "  ";
                     }
-                    questionAnswers = questionAnswer.split("-");
-                    studentAnswerReq.answer = questionAnswers[1];
-                    studentAnswerReq.examQuestionId = parseInt(questionAnswers[0]);
                     studentAnswerReq.exam_id = exam.id;
                 }
                 var flag = false;
@@ -539,7 +563,7 @@ $(document).ready(function () {
                 "        <div><b>question text:</b><textarea id=\"questionText\"></textarea></div>\n" +
                 "        <div><b>question title:</b><input id=\"questionTitle\" type='text' placeholder='title'></input></div>\n" +
                 "        <div>\n" +
-                "            <b>enter a default grade for question:  </b><input id=\"questionDefaultGrade\" type=\"number\" step=\"0.01\" placeholder=\"grade\">\n" +
+                "            <b>enter a default grade for question:  </b><input required id=\"questionDefaultGrade\" type=\"number\" step=\"0.01\" placeholder=\"grade\">\n" +
                 "        </div>\n" +
                 "        <input id=\"saveDetailQuestion\" type=\"submit\" value=\"save question\">\n" +
                 "    </form>");
@@ -931,19 +955,23 @@ $(document).ready(function () {
                     examId: exam.id
                 }
 
-                $("article").html("score: <input class='grade' required type='number' step=\"0.01\"> <br> " +
+                $("article").html("score: <input class='grade'  type='number' step=\"0.01\"> <br> " +
                     "<button id='submitForScore'>add score</button>");
                 $("#submitForScore").click(function () {
                     var grade = $(".grade").val();
-                    questionInfo.score = grade;
-                    for (var i = 0; i < questionBank.length; i++) {
-                        if (questionBank[i].id === questionInfo.questionId) {
-                            exam.examQuestionList.push(questionBank[i]);
-                            break;
+                    if (grade === null || grade === undefined || grade === "") {
+                        alert("enter score please")
+                    } else {
+                        questionInfo.score = grade;
+                        for (var i = 0; i < questionBank.length; i++) {
+                            if (questionBank[i].id === questionInfo.questionId) {
+                                exam.examQuestionList.push(questionBank[i]);
+                                break;
+                            }
                         }
+                        addFromQuestionBank(questionInfo);
+                        viewTeacherExam(exam)
                     }
-                    addFromQuestionBank(questionInfo);
-                    viewTeacherExam(exam)
                 })
             })
         }

@@ -26,14 +26,16 @@ public class TeacherController {
     final ExamService examService;
     final QuestionService questionService;
     final ExamQuestionService examQuestionService;
+    final StudentService studentService;
 
 
-    public TeacherController(CourseService courseService, TeacherService teacherService, ExamService examService, QuestionService questionService, ExamQuestionService examQuestionService) {
+    public TeacherController(CourseService courseService, TeacherService teacherService, ExamService examService, QuestionService questionService, ExamQuestionService examQuestionService, StudentService studentService) {
         this.courseService = courseService;
         this.teacherService = teacherService;
         this.examService = examService;
         this.questionService = questionService;
         this.examQuestionService = examQuestionService;
+        this.studentService = studentService;
     }
 
     @GetMapping("/find/courses")
@@ -138,10 +140,17 @@ public class TeacherController {
         ExamQuestionResponse examResponse = examQuestionService.findByIdAndTeacher(id, teacherUsername);
         return new ResponseEntity<>(examResponse, HttpStatus.ACCEPTED);
     }
+
     @PostMapping("/course/exam/auto-set-grade/{exam_id}/{course_id}")
     public ResponseEntity<?> autoSetGrade(@PathVariable Long exam_id, @PathVariable Long course_id) {
         examService.autoSetGrade(exam_id, course_id);
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
+    }
+
+    @GetMapping("/course/exam/get-students-answers/{exam_id}")
+    public ResponseEntity<List<ExamStudentsResponse>> studentAnswers(@PathVariable Long exam_id) {
+        List<ExamStudentsResponse> examStudentsResponses = studentService.findAllStudentsWithAnswers(exam_id);
+        return new ResponseEntity<>(examStudentsResponses, HttpStatus.ACCEPTED);
     }
 }
 

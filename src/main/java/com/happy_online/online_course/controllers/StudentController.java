@@ -5,10 +5,8 @@ import com.happy_online.online_course.payload.request.StudentAnswerRequest;
 import com.happy_online.online_course.payload.response.ExamQuestionAnswerResponse;
 import com.happy_online.online_course.payload.response.ExamQuestionResponse;
 import com.happy_online.online_course.payload.response.ExamResponseForView;
-import com.happy_online.online_course.service.CourseService;
-import com.happy_online.online_course.service.ExamQuestionService;
-import com.happy_online.online_course.service.ExamService;
-import com.happy_online.online_course.service.StudentAnswersService;
+import com.happy_online.online_course.payload.response.ExamStudentsResponse;
+import com.happy_online.online_course.service.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,12 +17,14 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/student")
 public class StudentController {
+    private final StudentService studentService;
     private final CourseService courseService;
     private final ExamService examService;
     private final ExamQuestionService examQuestionService;
     private final StudentAnswersService studentAnswersService;
 
-    public StudentController(CourseService courseService, ExamService examService, ExamQuestionService examQuestionService, StudentAnswersService studentAnswersService) {
+    public StudentController(StudentService studentService, CourseService courseService, ExamService examService, ExamQuestionService examQuestionService, StudentAnswersService studentAnswersService) {
+        this.studentService = studentService;
         this.courseService = courseService;
         this.examService = examService;
         this.examQuestionService = examQuestionService;
@@ -75,5 +75,6 @@ public class StudentController {
         Boolean check = studentAnswersService.checkForEnd(exam_id, username);
         return new ResponseEntity<>(check, HttpStatus.ACCEPTED);
     }
+
 
 }

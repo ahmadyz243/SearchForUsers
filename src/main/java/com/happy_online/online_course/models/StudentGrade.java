@@ -16,6 +16,7 @@ import javax.persistence.OneToOne;
 @AllArgsConstructor
 @NoArgsConstructor
 public class StudentGrade extends BaseDomain<Long> {
+    private Boolean showAble = false;
     @ManyToOne
     private Exam exam;
     private Double score = 0D;
@@ -24,7 +25,12 @@ public class StudentGrade extends BaseDomain<Long> {
     @OneToOne
     private StudentAnswers studentAnswers;
     private Boolean isAutoSet = false;
+
     public void setScore(Double score) {
         this.score = this.score + score;
+    }
+
+    public void fullSetScore(Double score) {
+        this.score = score;
     }
 }

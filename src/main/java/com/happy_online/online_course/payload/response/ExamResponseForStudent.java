@@ -15,4 +15,5 @@ public class ExamResponseForStudent {
     private LocalDateTime endDate;
     private Integer time;
     private Boolean enabled;
+    private Double score = 0D;
 }

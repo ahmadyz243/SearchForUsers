@@ -57,7 +57,6 @@ $(document).ready(function () {
                         break;
                     }
                 }
-                console.log(studentCourse);
                 viewStudentCourse(studentCourse);
             })
         })
@@ -109,7 +108,7 @@ $(document).ready(function () {
                     "          <td>" + course.examList[i].startDateAndTime + "</td>\n" +
                     "          <td>" + course.examList[i].time + "</td>\n" +
                     status +
-                    "          <td>-</td>\n" +
+                    "          <td>"+course.examList[i].score+"</td>\n" +
                     "        </tr>\n";
             }
             $("article").html(viewStudentCourseCode + "</table>");
@@ -240,7 +239,7 @@ $(document).ready(function () {
                 var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
                 var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
                 var seconds = Math.floor((distance % (1000 * 60)) / 1000);
-                $("#timeRemaining").html(hours + " hours & " + minutes + " min & " + seconds + " seconds");
+                $("#timeRemaining").html(hours + ":" + minutes + ":" + seconds);
                 if (distance < 0) {
                     clearInterval(x);
 
@@ -792,78 +791,183 @@ $(document).ready(function () {
                 $("article").html("");
             })
             $("#viewStudentsResponses").click(function () {
-                $("article").html("<div id=\"teacherViewStudentsAnswers\">\n" +
-
-                    "        <div class=\"studentsAnswers\">\n" +
-                    "            Ahmad Yazdi\n" +
-                    "        </div>\n" +
-                    "        <div class=\"studentsAnswers\">\n" +
-                    "            Ahmad Yazdi\n" +
-                    "        </div>\n" +
-                    "        <div class=\"studentsAnswers\">\n" +
-                    "            Ahmad Yazdi\n" +
-                    "        </div>\n" +
-
-                    "    </div>");
+                var examStudents = getExamStudents(exam.id);
+                var students = "<div id=\"teacherViewStudentsAnswers\">\n";
+                students = students.concat("<button id='setAutoGrade'> click here to set grade for multiple questions</button>")
+                for (let i = 0; i < examStudents.length; i++) {
+                    students = students.concat("<button value='" + examStudents[i].student.id + "' class=\"studentsAnswers\">\n" +
+                        "            " + examStudents[i].student.name + " " + examStudents[i].student.lastname +
+                        "        </button>\n")
+                }
+                students = students.concat("</div>");
+                $("article").html(
+                    students
+                );
                 $(".studentsAnswers").click(function () {
-                    $("article").html("<div id=\"teacherViewStudentAnswers\">\n" +
-                        "        <h2>Ahmad Yazdi</h2>\n" +
-                        "\n" +
-                        "        <div class=\"teacherViewMultipleAnswers\">\n" +
-                        "            <p><b>Question 1:</b> Lorem ipsum dolor sit amet consectetur adipisicing elit. Ratione voluptates, labore repellat nostrum nemo fuga magnam odio, eius numquam incidunt omnis. Totam deserunt optio ab itaque labore officia quos placeat?(score: 3)</p>\n" +
-                        "            <p><b>Student Answer:</b> Option 1(ex mollitia voluptatem laborum ullam? Provident, autem eum)</p>\n" +
-                        "            <p><b>earned score:</b> 3</p>\n" +
-                        "            <hr>\n" +
-                        "        </div>\n" +
-                        "\n" +
-                        "        <div class=\"teacherViewMultipleAnswers\">\n" +
-                        "            <p><b>Question 2:</b> Lorem ipsum dolor sit amet consectetur adipisicing elit. Ratione voluptates, labore repellat nostrum nemo fuga magnam odio, eius numquam incidunt omnis. Totam deserunt optio ab itaque labore officia quos placeat?(score: 3)</p>\n" +
-                        "            <p><b>Student Answer:</b> Option 1(ex mollitia voluptatem laborum ullam? Provident, autem eum)</p>\n" +
-                        "            <p><b>earned score:</b> 3</p>\n" +
-                        "            <hr>\n" +
-                        "        </div>\n" +
-                        "\n" +
-                        "        <div class=\"teacherViewMultipleAnswers\">\n" +
-                        "            <p><b>Question 3:</b> Lorem ipsum dolor sit amet consectetur adipisicing elit. Ratione voluptates, labore repellat nostrum nemo fuga magnam odio, eius numquam incidunt omnis. Totam deserunt optio ab itaque labore officia quos placeat?(score: 3)</p>\n" +
-                        "            <p><b>Student Answer:</b> Option 1(ex mollitia voluptatem laborum ullam? Provident, autem eum)</p>\n" +
-                        "            <p><b>earned score:</b> 3</p>\n" +
-                        "            <hr>\n" +
-                        "        </div>\n" +
-                        "\n" +
-                        "        <div class=\"teacherViewDetailAnswers\">\n" +
-                        "            <p><b>Question 4:</b> Lorem ipsum dolor sit amet consectetur adipisicing elit. Ratione voluptates, labore repellat nostrum nemo fuga magnam odio, eius numquam incidunt omnis. Totam deserunt optio ab itaque labore officia quos placeat?(score: 3)</p>\n" +
-                        "            <p><b>Student Answer:</b> Lorem ipsum dolor sit amet consectetur adipisicing elit. Quibusdam nesciunt corporis iste animi molestiae minus nulla eaque, culpa ducimus. Nobis consequuntur earum officia animi dolor iure quidem sed qui omnis?</p>\n" +
-                        "            <b>earned score:</b> <form><input type=\"number\"> <input type=\"submit\" value=\"save grade\"></form>\n" +
-                        "            <hr>\n" +
-                        "        </div>\n" +
-                        "\n" +
-                        "        <div class=\"teacherViewDetailAnswers\">\n" +
-                        "            <p><b>Question 5:</b> Lorem ipsum dolor sit amet consectetur adipisicing elit. Ratione voluptates, labore repellat nostrum nemo fuga magnam odio, eius numquam incidunt omnis. Totam deserunt optio ab itaque labore officia quos placeat?(score: 3)</p>\n" +
-                        "            <p><b>Student Answer:</b> Lorem ipsum dolor sit amet consectetur adipisicing elit. Quibusdam nesciunt corporis iste animi molestiae minus nulla eaque, culpa ducimus. Nobis consequuntur earum officia animi dolor iure quidem sed qui omnis?</p>\n" +
-                        "            <b>earned score:</b> <form><input type=\"number\"> <input type=\"submit\" value=\"save grade\"></form>\n" +
-                        "            <hr>\n" +
-                        "        </div>\n" +
-                        "\n" +
-                        "        <div class=\"teacherViewDetailAnswers\">\n" +
-                        "            <p><b>Question 6:</b> Lorem ipsum dolor sit amet consectetur adipisicing elit. Ratione voluptates, labore repellat nostrum nemo fuga magnam odio, eius numquam incidunt omnis. Totam deserunt optio ab itaque labore officia quos placeat?(score: 3)</p>\n" +
-                        "            <p><b>Student Answer:</b> Lorem ipsum dolor sit amet consectetur adipisicing elit. Quibusdam nesciunt corporis iste animi molestiae minus nulla eaque, culpa ducimus. Nobis consequuntur earum officia animi dolor iure quidem sed qui omnis?</p>\n" +
-                        "            <b>earned score:</b> <form><input type=\"number\"> <input type=\"submit\" value=\"save grade\"></form>\n" +
-                        "            <hr>\n" +
-                        "        </div>\n" +
-                        "\n" +
-                        "        <button id=\"endCorrection\" value=\"\">End Correction</button>\n" +
-                        "\n" +
-                        "    </div>");
+                    var allExamQuestions = getExamById(exam.id);
+                    var multipleQuestions = [];
+                    var detailedQuestions = [];
+                    var studentId = $(this).val();
+                    var questionAndAnswer = "";
+                    var studentFullAnswers = getStudentAnswersByStudentId(studentId, examStudents);
+                    console.log(studentFullAnswers);
+                    questionsCode = "<div id=\"teacherViewStudentAnswers\">" +
+                        "        <h2>" + studentFullAnswers.student.name + " " + studentFullAnswers.student.lastname +
+                        "</h2>\n";
+                    for (let i = 0; i < allExamQuestions.examQuestionList.length; i++) {
+                        if (allExamQuestions.examQuestionList[i].question.questionItemList !== null) {
+                            multipleQuestions.push(allExamQuestions.examQuestionList[i]);
+                        } else {
+                            detailedQuestions.push(allExamQuestions.examQuestionList[i]);
+                        }
+                    }
+                    var counter = 1;
+                    var flag = false;
+                    for (let i = 0; i < multipleQuestions.length; i++) {
+                        for (let j = 0; j < studentFullAnswers.studentAnswers.answers.length; j++) {
+                            if (multipleQuestions[i].question.question === studentFullAnswers.studentAnswers.answers[j].examQuestion.question.question) {
+                                console.log("now they fucking me")
+                                var answer = studentFullAnswers.studentAnswers.answers[j].answer;
+                                var score = 0;
+                                for (let k = 0; k < multipleQuestions[i].question.questionItemList.length; k++) {
+                                    if (answer === multipleQuestions[i].question.questionItemList[k].answer && multipleQuestions[i].question.questionItemList[k].isRightAnswer === true)
+                                        score = multipleQuestions[i].score;
+                                }
+                                questionAndAnswer = questionAndAnswer.concat("<div class=\"teacherViewMultipleAnswers\">\n" +
+                                    "            <p><b>Question " + counter + ":</b> " + multipleQuestions[i].question.question + "(score: " + multipleQuestions[i].score + ")</p>\n" +
+                                    "            <p><b>Student Answer:</b>" + answer +
+                                    "</p>\n" +
+                                    "            <p><b>earned score:</b>" + score + "</p>\n" +
+                                    "            <hr>\n" +
+                                    "        </div>\n"
+                                );
+                                counter++
+                                flag = true;
+                            }
+                        }
+                        if (flag === false) {
+                            questionAndAnswer = questionAndAnswer.concat("<div class=\"teacherViewMultipleAnswers\">\n" +
+                                "            <p><b>Question " + counter + ":</b> " + multipleQuestions[i].question.question + "(score: " + multipleQuestions[i].score + ")</p>\n" +
+                                "            <p><b>Student Answer:</b>" + "not answerd!" +
+                                "</p>\n" +
+                                "            <p><b>earned score:</b>" + "0" + "</p>\n" +
+                                "            <hr>\n" +
+                                "        </div>\n"
+                            );
+                            counter++;
+                        }
+
+                        flag = false;
+                    }
+                    var detailedFlag = false;
+                    for (let i = 0; i < detailedQuestions.length; i++) {
+
+                        for (let j = 0; j < studentFullAnswers.studentAnswers.answers.length; j++) {
+                            var Danswer = studentFullAnswers.studentAnswers.answers[j].answer;
+                            if (detailedQuestions[i].question.question === studentFullAnswers.studentAnswers.answers[j].examQuestion.question.question) {
+                                questionAndAnswer = questionAndAnswer.concat("        <div class=\"teacherViewDetailAnswers\">\n" +
+                                    "            <p><b>Question " + counter + ":</b> " + detailedQuestions[i].question.question + "(score:" + DetailedQuestions[i].score +
+                                    ")</p>\n" +
+                                    "    <p><b>Student Answer:</b> " + Danswer + " </p>\n" +
+                                    "    <b>earned score:</b> <form><input value='" + studentFullAnswers.studentAnswers.answers[j].earnedScore + "' id='detailedGrade' type=\"number\"> <button type=\"submit\" id='addGrade' value=" + studentFullAnswers.studentAnswers.answers[j].questionAnswerId + ">save</button></form>\n" +
+                                    "    <hr>\n" +
+                                    "</div>\n");
+                                detailedFlag = true;
+                            }
+                        }
+                        if (detailedFlag === false) {
+                            questionAndAnswer = questionAndAnswer.concat("<div class=\"teacherViewDetailAnswers\">\n" +
+                                "            <p><b>Question " + counter + ":</b> " + detailedQuestions[i].question.question + "(score:" + DetailedQuestions[i].score +
+                                ")</p>\n" +
+                                "            <p><b>Student Answer:</b> " + "not answerd!" + " </p>\n" +
+                                "            <b>earned score:</b> <form><input id='detailedGrade' value='0' type=\"number\"> </form>\n" +
+                                "            <hr>\n" +
+                                "        </div>\n");
+                        }
+                        detailedFlag = false;
+                        counter++;
+                    }
+                    questionsCode = questionsCode.concat(questionAndAnswer + "</div>")
+                    $("article").html(
+                        questionsCode
+                    );
+                    $("#addGrade").click(function (event) {
+                            event.preventDefault();
+                            var grade = $("#detailedGrade").val();
+                            var questionAnswerId = $(this).val();
+                            console.log(grade);
+                            console.log(questionAnswerId);
+                            setGrade(questionAnswerId, grade);
+                        }
+                    )
                 })
-            })
-            $("#editQuestion").click(function () {
-                var questionId = $(this).val();
-                editQuestion(questionId, exam);
+                $("#setAutoGrade").click(function () {
+                    setAutoGrade(exam.id, courseId);
+                })
+                $("#editQuestion").click(function () {
+                    var questionId = $(this).val();
+                    editQuestion(questionId, exam);
+
+                })
+                $("#addFromBank").click(function () {
+                    addQuestionFromBank(exam, courseId);
+                })
 
             })
-            $("#addFromBank").click(function () {
-                addQuestionFromBank(exam, courseId);
+        }
+
+
+        function getStudentAnswersByStudentId(studentId, examStudents) {
+            for (let i = 0; i < examStudents.length; i++) {
+                if (examStudents[i].student.id === parseInt(studentId)) {
+                    return examStudents[i];
+                }
+            }
+        }
+
+        function setGrade(questionAnswerId, grade) {
+            $.ajax({
+                url: "/api/teacher/course/exam/set-grade/" + questionAnswerId + "/" + grade,
+                method: "PUT",
+                contentType: "application/json",
+                success: function (response) {
+                    alert("done!")
+                },
+                error: function (erorMessage) {
+                    alert("score is so high");
+                }
             })
+        }
+
+        function setAutoGrade(examId, courseId) {
+            $.ajax({
+                url: "/api/teacher/course/exam/auto-set-grade/" + examId + "/" + courseId,
+                method: "POST",
+                contentType: "application/json",
+                success: function (response) {
+                    alert("done!")
+                },
+                error: function (erorMessage) {
+                    alert("you have to do this after the exam");
+                }
+            })
+        }
+
+        function getExamStudents(examId) {
+            var examStudents = [];
+            $.ajax({
+                url: "/api/teacher/course/exam/get-students-answers/" + examId,
+                method: "GET",
+                async: false,
+                contentType: "application/json",
+                success: function (response) {
+                    examStudents = response;
+                },
+                error: function (erorMessage) {
+                    console.log(erorMessage);
+                }
+            })
+            return examStudents;
         }
 
         function updateExam(exam) {

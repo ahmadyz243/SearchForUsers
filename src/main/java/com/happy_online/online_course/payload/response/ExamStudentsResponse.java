@@ -10,4 +10,5 @@ import java.util.List;
 public class ExamStudentsResponse {
     private StudentResponse student;
     private LastStudentsAnswersResponse StudentAnswers;
+    private List<ExamQuestionResponse> examQuestionResponses;
 }

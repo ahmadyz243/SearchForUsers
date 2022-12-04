@@ -38,4 +38,6 @@ public interface ExamService extends BaseService<Exam, Long> {
     void addDetailedQuestion(DetailedQuestionDTO detailedQuestion);
 
     void autoSetGrade(Long exam_id, Long course_id);
+
+    void showGradesToStudents(Long exam_id);
 }

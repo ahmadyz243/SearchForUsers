@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 
@@ -16,8 +17,9 @@ import javax.persistence.ManyToOne;
 @NoArgsConstructor
 public class ExamQuestionAnswer extends BaseDomain<Long> {
     private String Answer;
+    private Double earnedScore = 0D;
     @ManyToOne
     private ExamQuestion examQuestion;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.MERGE)
     private StudentAnswers studentAnswers;
 }

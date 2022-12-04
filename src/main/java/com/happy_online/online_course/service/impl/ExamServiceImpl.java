@@ -19,11 +19,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.Inheritance;
+import javax.swing.text.html.Option;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class ExamServiceImpl extends BaseServiceImpl<Exam, Long, ExamRepository> implements ExamService {
@@ -148,31 +150,31 @@ public class ExamServiceImpl extends BaseServiceImpl<Exam, Long, ExamRepository>
                 break;
             }
         }
-        if (exam.getEndDate().isAfter(LocalDateTime.now())) {
+        if (LocalDateTime.now().isAfter(exam.getEndDate())) {
             List<Student> students = course.getStudentList();
             List<StudentAnswers> studentsAnswers = exam.getStudentAnswers();
             Exam finalExam = exam;
             students.forEach(student -> {
                 studentsAnswers.forEach(studentAnswers -> {
-                    if (student == studentAnswers.getStudent()) {
+                    if (student == studentAnswers.getStudent() && !studentAnswers.getGrade().getIsAutoSet()) {
                         studentAnswers.getExamQuestionAnswerList().forEach(studentAnswer -> {
-                            MultipleChoiceQuestion multipleChoiceQuestion = (MultipleChoiceQuestion) studentAnswer.getExamQuestion().getQuestion();
-                            if (multipleChoiceQuestion.getQuestionItemList() != null) {
-                                multipleChoiceQuestion.getQuestionItemList().forEach(questionItem -> {
-                                    if (questionItem.getIsRightAnswer()) {
-                                        String correctAnswer = questionItem.getAnswer();
-                                        if (studentAnswer.getAnswer().equals(correctAnswer)) {
-                                            student.getStudentGrades().forEach(grade -> {
-                                                if (grade.getExam() == finalExam) {
-                                                    if (!grade.getIsAutoSet()) {
+                            if (studentAnswer.getExamQuestion().getQuestion() instanceof MultipleChoiceQuestion multipleChoiceQuestion) {
+                                if (multipleChoiceQuestion.getQuestionItemList() != null) {
+                                    multipleChoiceQuestion.getQuestionItemList().forEach(questionItem -> {
+                                        if (questionItem.getIsRightAnswer()) {
+                                            String correctAnswer = questionItem.getAnswer();
+                                            if (studentAnswer.getAnswer().equals(correctAnswer)) {
+                                                student.getStudentGrades().forEach(grade -> {
+                                                    if (grade.getExam() == finalExam) {
                                                         grade.setScore(studentAnswer.getExamQuestion().getScore());
+                                                        studentAnswer.setEarnedScore(studentAnswer.getExamQuestion().getScore());
+                                                        grade.setIsAutoSet(true);
                                                     }
-                                                    grade.setIsAutoSet(true);
-                                                }
-                                            });
+                                                });
+                                            }
                                         }
-                                    }
-                                });
+                                    });
+                                }
                             }
                         });
                     }
@@ -182,6 +184,15 @@ public class ExamServiceImpl extends BaseServiceImpl<Exam, Long, ExamRepository>
             throw new BadCredentialsException("you can just set the scores after the exam!");
         }
 
+    }
+
+    @Override
+    @Transactional
+    public void showGradesToStudents(Long exam_id) {
+        Optional<Exam> exam = repository.findById(exam_id);
+        exam.ifPresent(value -> value.getStudentGrades().forEach(studentGrade -> {
+            studentGrade.setShowAble(true);
+        }));
     }
 
 

@@ -21,7 +21,6 @@ public class Exam extends BaseDomain<Long> {
     private Course course;
     @Column(nullable = false, name = "theTitle")
     private String title;
-
     @Column(nullable = false)
     private String description;
     @Column(nullable = false, name = "startsDate")

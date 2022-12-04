@@ -10,4 +10,6 @@ public interface ExamQuestionService extends BaseService<ExamQuestion, Long> {
     ExamQuestionResponse findByIdAndTeacher(Long id, String teacherUsername);
 
     List<ExamQuestionResponse> findAllByExamId(Long exam_id);
+
+    void setGrade(Long examQuestionAnswerId, Double grade);
 }

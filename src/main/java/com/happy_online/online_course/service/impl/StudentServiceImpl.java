@@ -95,6 +95,8 @@ public class StudentServiceImpl extends BaseServiceImpl<Student, Long, StudentRe
                 examQuestionStudentAnswer[0] = new ExamQuestionStudentAnswersResponse();
                 ExamQuestionResponse examQuestionResponse = examQuestionMapper.examQuestionToExamQuestionResponse(answer.getExamQuestion());
                 examQuestionResponse.setExamQuestionId(answer.getExamQuestion().getId());
+                examQuestionStudentAnswer[0].setQuestionAnswerId(answer.getId());
+                examQuestionStudentAnswer[0].setEarnedScore(answer.getEarnedScore());
                 examQuestionStudentAnswer[0].setAnswer(answer.getAnswer());
                 examQuestionStudentAnswer[0].setExamQuestion(examQuestionResponse);
                 studentAnswersResponse.setAnswers(examQuestionStudentAnswer[0]);

@@ -133,12 +133,18 @@ public class CourseServiceImpl extends BaseServiceImpl<Course, Long, CourseRepos
     @Override
     public List<CourseInfoResponseForStudent> findStudentCourses(String studentUsername) {
         Student student = studentService.findByUsername(studentUsername);
+        List<StudentGrade> studentGrades = student.getStudentGrades();
         List<Course> studentCourses = repository.findByStudentListContaining(student);
         List<CourseInfoResponseForStudent> courseResponse = courseMapper.mapCoursesToCourseInfoResponseForStudentList(studentCourses);
         for (int i = 0; i < studentCourses.size(); i++) {
             courseResponse.get(i).setTeacherName(studentCourses.get(i).getTeacher().getName());
             courseResponse.get(i).setId(studentCourses.get(i).getId());
             courseResponse.get(i).getExamList().forEach(exam -> {
+                for (StudentGrade studentGrade : studentGrades) {
+                    if (studentGrade.getShowAble() && studentGrade.getExam().getId().equals(exam.getId())) {
+                        exam.setScore(studentGrade.getScore());
+                    }
+                }
                 exam.setEnabled(checkForEnableExam(exam));
             });
         }

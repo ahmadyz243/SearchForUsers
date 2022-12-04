@@ -152,5 +152,17 @@ public class TeacherController {
         List<ExamStudentsResponse> examStudentsResponses = studentService.findAllStudentsWithAnswers(exam_id);
         return new ResponseEntity<>(examStudentsResponses, HttpStatus.ACCEPTED);
     }
+
+    @PutMapping("/course/exam/set-grade/{examQuestionAnswerId}/{grade}")
+    public ResponseEntity<?> setGrade(@PathVariable Long examQuestionAnswerId, @PathVariable Double grade) {
+        examQuestionService.setGrade(examQuestionAnswerId, grade);
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+    }
+
+    @PutMapping("/course/exam/show-grades/{exam_id}")
+    public ResponseEntity<?> showGradesToStudents(@PathVariable Long exam_id) {
+        examService.showGradesToStudents(exam_id);
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+    }
 }
 

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="hostile.css">
+    <script src="jquery.min.js"></script>
+    <title>Login</title>
+</head>
+<body>
+
+    <div id="formSection">
+        <form id="addNewPersonForm">
+            <input name="firstname" placeholder="firstname" type="text" required>
+            <input name="lastname" placeholder="lastname" type="text" required>
+            <input name="mobileNumber" placeholder="mobileNumber" type="text" required>
+            <input name="age" placeholder="age" type="number" required>
+            <input name="score" placeholder="score" type="number" step="any" required>
+            MALE:<input id="male" name="gender" value="MALE" type="radio" required><br>
+            FEMALE:<input id="female" name="gender" value="FEMALE" type="radio" required><br>
+            <input type="submit" value="save">
+        </form>
+    </div>
+
+    <div id="buttons">
+        <button id="nameStartsWitha" type="button">
+            people who their name start with 'a'
+        </button>
+        <button id="lastnameEndsWithC" type="button">
+            people who their lastname ends with 'c'
+        </button>
+        <button id="fOrLnameContainsBAndAgeGreaterThanEighteen" type="button">
+            first or lastname contains 'b' and greater than 18
+        </button>
+        <button id="findAllPeople" type="button">
+            find all people
+        </button>
+    </div>
+
+    <div id="results">
+        <table id="result-table">
+
+        </table>
+        <p>average ages: <span id="avg"></span>  youngest: <span id="young"></span></p>
+    </div>
+
+<script src="myjs.js"></script>
+</body>
+</html>

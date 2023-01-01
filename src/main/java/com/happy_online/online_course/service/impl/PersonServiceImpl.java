@@ -1,6 +1,8 @@
 package com.happy_online.online_course.service.impl;
 
 import com.happy_online.online_course.domain.Person;
+import com.happy_online.online_course.dto.CountPeopleByAge;
+import com.happy_online.online_course.mapper.MyMapper;
 import com.happy_online.online_course.repository.PersonRepository;
 import com.happy_online.online_course.service.PersonService;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +17,7 @@ import java.util.List;
 public class PersonServiceImpl implements PersonService {
 
     private final PersonRepository repository;
+    private final MyMapper myMapper;
 
     @Override
     public void save(Person person) {
@@ -48,7 +51,23 @@ public class PersonServiceImpl implements PersonService {
 
     @Override
     public List<Person> getYoungest() {
-        System.out.println(repository.getYoungest());
         return repository.getYoungest();
+    }
+
+    @Override
+    public List<Person> getOldest() {
+        return repository.getOldest();
+    }
+
+    @Override
+    public int countPeopleByAgeGreaterThanEighteen() {
+        return repository.countPeopleByAgeGreaterThan(18);
+    }
+
+    @Override
+    public List<CountPeopleByAge> countPeopleGroupByAge() {
+        return myMapper.mapTuplesToCountPeopleByAgeEntities(
+                repository.countPeopleGroupByAge()
+        );
     }
 }

@@ -36,6 +36,10 @@ $(document).ready(function () {
         var people = findAllPeople();
         viewResults(people);
     })
+    $("#peopleGroupByAge").click(function (){
+        var people = countPeopleGroupByAge();
+        viewPeopleCountGroupByAge(people);
+    })
 
     function savePerson(person){
         $.ajax({
@@ -54,8 +58,10 @@ $(document).ready(function () {
         })
     }
     function viewResults(people){
-        $("#avg").html(getAvgAge());
-        $("#young").html(getYoungest());
+        $("#avg").html("average ages: " + getAvgAge());
+        $("#young").html("&nbsp;  youngest: " + getYoungest());
+        $("#oldest").html("&nbsp;  oldest: " + getOldest());
+        $("#greaterThanEighteen").html(countPeopleGreaterThanEighteen() + " people are greater than 18 years old").css("color", "#00FFFFFF");
         $("#result-table").show();
         $("#result-table").html("");
         $("#result-table").append("<tr>\n" +
@@ -180,4 +186,57 @@ $(document).ready(function () {
         return youngest;
     }
 
+    function getOldest(){
+        var oldest = "";
+        $.ajax({
+            url: "/api/get-oldest",
+            method: "GET",
+            contentType: "application/json",
+            async: false,
+            dataType: "json",
+            success: function (response) {
+                oldest = response.firstname + " " + response.lastname;
+            },
+            error: function (erorMessage) {
+                console.log(erorMessage);
+            }
+        })
+        return oldest;
+    }
+
+    function countPeopleGreaterThanEighteen(){
+
+    }
+
+    function countPeopleGroupByAge(){
+        var entities = [];
+        $.ajax({
+            url: "/api/count-people-group-by-age",
+            method: "GET",
+            contentType: "application/json",
+            async: false,
+            dataType: "json",
+            success: function (response) {
+                entities = response;
+            },
+            error: function (erorMessage) {
+                console.log(erorMessage);
+            }
+        })
+        return entities;
+    }
+    function viewPeopleCountGroupByAge(people){
+        $("#result-table").show();
+        $("#result-table").html("");
+        $("#result-table").append("<tr>\n" +
+            "                <th>count of people</th>\n" +
+            "                <th>age</th>\n" +
+            "            </tr>");
+        for (let i = 0; i < people.length; i++) {
+            $("#result-table").append("<tr>\n" +
+                "                <td>" + people[i].count + "</td>\n" +
+                "                <td>" + people[i].age + "</td>\n" +
+                "            </tr>");
+        }
+    }
 })

@@ -2,6 +2,7 @@ package com.happy_online.online_course.service;
 
 
 import com.happy_online.online_course.domain.Person;
+import com.happy_online.online_course.dto.CountPeopleByAge;
 
 import java.util.List;
 
@@ -13,4 +14,7 @@ public interface PersonService {
     List<Person> findAll();
     int getAvgAge();
     List<Person> getYoungest();
+    List<Person> getOldest();
+    int countPeopleByAgeGreaterThanEighteen();
+    List<CountPeopleByAge> countPeopleGroupByAge();
 }

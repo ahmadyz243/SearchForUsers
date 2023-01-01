@@ -1,6 +1,7 @@
 package com.happy_online.online_course.rest;
 
 import com.happy_online.online_course.domain.Person;
+import com.happy_online.online_course.dto.CountPeopleByAge;
 import com.happy_online.online_course.dto.MessageResponse;
 import com.happy_online.online_course.service.PersonService;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +34,16 @@ public class ApiServices {
         return new ResponseEntity<>(service.getYoungest(), HttpStatus.ACCEPTED);
     }
 
+    @GetMapping("/get-oldest")
+    public ResponseEntity<Person> getOldest(){
+        return new ResponseEntity<>(service.getOldest().get(0), HttpStatus.ACCEPTED);
+    }
+
+    @GetMapping("/count-greater-eighteen")
+    public ResponseEntity<Integer> countPeopleGreaterThanEighteen(){
+        return new ResponseEntity<>(service.countPeopleByAgeGreaterThanEighteen(), HttpStatus.ACCEPTED);
+    }
+
     @GetMapping("/find-all-people")
     public ResponseEntity<List<Person>> findPeople(){
         return new ResponseEntity<>(service.findAll(), HttpStatus.ACCEPTED);
@@ -51,6 +62,12 @@ public class ApiServices {
     @GetMapping("/name-contains-b-and-age-greater-eighteen")
     public ResponseEntity<List<Person>> firstOrLastContainsBAndAgeMoreThanEighteen(){
         return new ResponseEntity<>(service.firstnameOrLastnameContainsBAndAgeGreaterThanEighteen(), HttpStatus.ACCEPTED);
+    }
+
+    @GetMapping("/count-people-group-by-age")
+    public ResponseEntity<List<CountPeopleByAge>> countPeopleByAge(){
+        List<CountPeopleByAge> list = service.countPeopleGroupByAge();
+        return new ResponseEntity<>(list, HttpStatus.ACCEPTED);
     }
 
 }

@@ -4,23 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ba202959-7e2a-4249-899d-c483ff1ee0de" name="Changes" comment="add some queries">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/happy_online/online_course/dto/CountPeopleByAge.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/happy_online/online_course/mapper/MyMapper.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/happy_online/online_course/mapper/MyMapperImpl.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/static/myscript.js" afterDir="false" />
+    <list default="true" id="ba202959-7e2a-4249-899d-c483ff1ee0de" name="Changes" comment="add some more queries">
+      <change afterPath="$PROJECT_DIR$/src/main/resources/static/myStyle.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/happy_online/online_course/repository/PersonRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/happy_online/online_course/repository/PersonRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/happy_online/online_course/rest/ApiServices.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/happy_online/online_course/rest/ApiServices.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/happy_online/online_course/service/PersonService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/happy_online/online_course/service/PersonService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/happy_online/online_course/service/impl/PersonServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/happy_online/online_course/service/impl/PersonServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/myjs.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/static/hostile.css" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/templates/views/homepage.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/views/homepage.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/happy_online/online_course/repository/PersonRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/happy_online/online_course/repository/PersonRepository.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/happy_online/online_course/rest/ApiServices.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/happy_online/online_course/rest/ApiServices.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/happy_online/online_course/service/PersonService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/happy_online/online_course/service/PersonService.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/happy_online/online_course/service/impl/PersonServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/happy_online/online_course/service/impl/PersonServiceImpl.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/static/myjs.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/static/hostile.css" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/templates/views/homepage.html" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/templates/views/homepage.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -31,10 +20,10 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="CSS File" />
         <option value="Interface" />
         <option value="Class" />
         <option value="JavaScript File" />
+        <option value="CSS File" />
       </list>
     </option>
   </component>
@@ -140,7 +129,8 @@
       <workItem from="1671354068582" duration="6924000" />
       <workItem from="1671621211808" duration="78000" />
       <workItem from="1672463422085" duration="750000" />
-      <workItem from="1672558035241" duration="11451000" />
+      <workItem from="1672558035241" duration="11564000" />
+      <workItem from="1672647331100" duration="438000" />
     </task>
     <task id="LOCAL-00001" summary="add some queries">
       <created>1672463622970</created>
@@ -149,7 +139,14 @@
       <option name="project" value="LOCAL" />
       <updated>1672463622970</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="add some more queries">
+      <created>1672569538350</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1672569538350</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -169,6 +166,7 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="add some queris" />
     <MESSAGE value="add some queries" />
-    <option name="LAST_COMMIT_MESSAGE" value="add some queries" />
+    <MESSAGE value="add some more queries" />
+    <option name="LAST_COMMIT_MESSAGE" value="add some more queries" />
   </component>
 </project>

@@ -39,6 +39,12 @@ table, th, td {
     height: 800px;
     margin-top: 10px;
 }
+#buttons button{
+    width: 100%;
+    height: 40px;
+    background-color: #00eaff;
+    margin-bottom: 7px;
+}
 #results{
     margin-top: 10px;
     margin-left: 2%;
@@ -47,4 +53,3 @@ table, th, td {
 #results p{
     color: azure;
 }
-
